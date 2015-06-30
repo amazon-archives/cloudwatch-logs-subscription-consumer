@@ -1,2 +1,5 @@
 target/
 AwsCredentials.properties
+.classpath
+.project
+/.settings
