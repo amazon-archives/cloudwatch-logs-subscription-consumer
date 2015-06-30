@@ -1,0 +1,35 @@
+{
+    "messageType": "DATA_MESSAGE",
+    "owner": "123456789012",
+    "logGroup": "Apache/access.log",
+    "logStream": "i-c3f9bec9",
+    "subscriptionFilters": [
+        "access-logs"
+    ],
+    "logEvents": [
+        {
+            "id": "49545295115971876468408574808414755329919666212443258898",
+            "timestamp": "1421116133213",
+            "message": "127.0.0.1 frank GET 200 4535",
+            "extractedFields": {
+                "ip": "127.0.0.1",
+                "user": "frank",
+                "verb": "GET",
+                "status_code": "200",
+                "response_size": "4535"
+            }
+        },
+        { 
+            "id": "49545295115971876468408574808465530214343480843939348498",
+            "timestamp": "1421116143214",
+            "message": "127.0.0.1 alice POST 404 34",
+            "extractedFields": {
+                "ip": "127.0.0.1",
+                "user": "alice",
+                "verb": "POST",
+                "status_code": "404",
+                "response_size": "34"
+            }
+        }
+    ]
+}

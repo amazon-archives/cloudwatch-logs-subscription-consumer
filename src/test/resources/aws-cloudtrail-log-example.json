@@ -1,0 +1,21 @@
+{
+    "messageType": "DATA_MESSAGE",
+    "owner": "123456789012",
+    "logGroup": "CloudTrail",
+    "logStream": "123456789012_CloudTrail_us-east-1",
+    "subscriptionFilters": [
+        "cloudtrail"
+    ],
+    "logEvents": [
+        {
+            "id": "49545295115971876468408574808465530214343480843939348498",
+            "timestamp": "1421116143214",
+            "message": "{\"eventVersion\":\"1.02\",\"userIdentity\":{\"type\":\"Root\",\"principalId\":\"123456789012\",\"arn\":\"arn:aws:iam::123456789012:root\",\"accountId\":\"123456789012\"},\"eventTime\":\"2015-02-17T02:35:10Z\",\"eventSource\":\"signin.amazonaws.com\",\"eventName\":\"ConsoleLogin\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"52.20.0.1\",\"userAgent\":\"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10.9; rv:31.0) Gecko\/20100101 Firefox\/31.0\",\"requestParameters\":null,\"responseElements\":{\"ConsoleLogin\":\"Success\"},\"additionalEventData\":{\"MobileVersion\":\"No\",\"LoginTo\":\"https:\/\/console.aws.amazon.com\/console\/home?nc2\",\"MFAUsed\":\"No\"},\"eventID\":\"11ffbf73-2e62-4a5b-b218-ae13573f0054\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"123456789012\"}"
+        },
+        {
+            "id": "49545295115971876468408574808465530214343150403450640305",
+            "timestamp": "1421116143456",
+            "message": "{\"eventVersion\":\"1.02\",\"userIdentity\":{\"type\":\"Root\",\"principalId\":\"123456789012\",\"arn\":\"arn:aws:iam::123456789012:root\",\"accountId\":\"123456789012\",\"accessKeyId\":\"ASIAJEXZJZUUCTPORPRA\",\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"false\",\"creationDate\":\"2015-02-17T02:35:10Z\"}}},\"eventTime\":\"2015-02-17T02:35:57Z\",\"eventSource\":\"cloudtrail.amazonaws.com\",\"eventName\":\"DescribeTrails\",\"awsRegion\":\"us-west-2\",\"sourceIPAddress\":\"52.20.0.1\",\"userAgent\":\"console.amazonaws.com\",\"requestParameters\":{\"trailNameList\":[]},\"responseElements\":null,\"requestID\":\"b3d735aa-b64d-11e4-98a1-576572d069bc\",\"eventID\":\"eb1b451e-e7c8-4dae-ab34-2baef9a8394e\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"123456789012\"}"
+        }
+    ]
+}
