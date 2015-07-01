@@ -1,0 +1,741 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "A sample Elasticsearch/Kibana stack that hooks up with real-time data from CloudWatch Logs using a Subscription Filter. **NOTE** This template creates one or more Amazon EC2 instances, an Amazon Kinesis stream, and an Elastic Load Balancer. You will be billed for the AWS resources used if you create a stack from this template. You must have permissions to create IAM roles to use this template.",
+
+  "Parameters" : {
+
+    "KeyName": {
+      "Description" : "The name of an existing key pair to enable SSH access to Amazon EC2 instances",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+
+    "InstanceType" : {
+      "Description" : "Elasticsearch Node Type (EC2 Instance)",
+      "Type" : "String",
+      "Default" : "m3.large",
+      "AllowedValues" : [ 
+        "t2.micro", 
+        "t2.small", 
+        "m3.medium", 
+        "m3.large", 
+        "m3.xlarge", 
+        "m3.2xlarge", 
+        "c3.large", 
+        "c3.xlarge", 
+        "c3.2xlarge", 
+        "c3.4xlarge", 
+        "c3.8xlarge", 
+        "c4.large", 
+        "c4.xlarge", 
+        "c4.2xlarge", 
+        "c4.4xlarge", 
+        "c4.8xlarge", 
+        "r3.large", 
+        "r3.xlarge", 
+        "r3.2xlarge", 
+        "r3.4xlarge", 
+        "r3.8xlarge", 
+        "i2.xlarge", 
+        "i2.2xlarge", 
+        "i2.4xlarge", 
+        "i2.8xlarge", 
+        "d2.xlarge", 
+        "d2.2xlarge", 
+        "d2.4xlarge", 
+        "d2.8xlarge", 
+        "hi1.4xlarge", 
+        "hs1.8xlarge", 
+        "cr1.8xlarge", 
+        "cc2.8xlarge"
+       ],
+      "ConstraintDescription" : "Must be a valid Amazon EC2 instance type"
+    },
+
+    "AllowedIpSource" : {
+      "Description" : "The IP address range that can be used to access the Kibana interface, the Elasticsearch API, and the EC2 instances via SSH",
+      "Type": "String",
+      "MinLength": "9",
+      "MaxLength": "18",
+      "Default": "0.0.0.0/0",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x"
+    },
+
+    "ClusterSize" : {
+      "Description" : "The number of EC2 instances hosting an Elasticsearch node",
+      "Type" : "Number",
+      "Default" : "1"
+    },
+
+    "LogGroupName": {
+      "Description": "The CloudWatch Logs log group to use as the source for the subscription that feeds the Elasticsearch cluster",
+      "Type": "String",
+      "Default": ""
+    },
+    
+    "NginxUsername" : {
+      "Description": "Username to access the Kibana interface and the Elasticsearch API",
+      "Type": "String",
+      "MinLength" : "1"
+    },
+    
+    "NginxPassword" : {
+      "Description": "Password to access the Kibana interface and the Elasticsearch API",
+      "Type": "String",
+      "NoEcho" : "true"
+    },
+
+    "RetentionDays" : {
+      "Description": "Number of days to retain logs in the Elasticsearch cluster",
+      "Type": "Number",
+      "MinValue" : "0"
+    },
+    
+    "MonitorStack" : {
+      "Description": "Push logs from Elasticsearch, Nginx, KCL and CloudFormation to CloudWatch Logs",
+      "Type": "String",
+      "Default" : "true",
+      "AllowedValues" : ["true", "false"]
+    },
+    
+    "SubscriptionFilterPattern" : {
+      "Description": "Filter pattern to use for the new subscription filter",
+      "Type": "String"
+    },
+    
+    "NumberOfKinesisShards": {
+      "Description": "Number of shards to create for the Kinesis subscription stream",
+      "Type": "Number",
+      "MinValue" : "1"
+    }
+  },
+
+  "Mappings" : {
+    "AWSInstanceType2Arch" : {
+      "t2.micro"    : { "Arch" : "HVM64"  },
+      "t2.small"    : { "Arch" : "HVM64"  },
+      "t2.medium"   : { "Arch" : "HVM64"  },
+      "m3.medium"   : { "Arch" : "HVM64"  },
+      "m3.large"    : { "Arch" : "HVM64"  },
+      "m3.xlarge"   : { "Arch" : "HVM64"  },
+      "m3.2xlarge"  : { "Arch" : "HVM64"  },
+      "c3.large"    : { "Arch" : "HVM64"  },
+      "c3.xlarge"   : { "Arch" : "HVM64"  },
+      "c3.2xlarge"  : { "Arch" : "HVM64"  },
+      "c3.4xlarge"  : { "Arch" : "HVM64"  },
+      "c3.8xlarge"  : { "Arch" : "HVM64"  },
+      "c4.large"    : { "Arch" : "HVM64"  },
+      "c4.xlarge"   : { "Arch" : "HVM64"  },
+      "c4.2xlarge"  : { "Arch" : "HVM64"  },
+      "c4.4xlarge"  : { "Arch" : "HVM64"  },
+      "c4.8xlarge"  : { "Arch" : "HVM64"  },
+      "r3.large"    : { "Arch" : "HVM64"  },
+      "r3.xlarge"   : { "Arch" : "HVM64"  },
+      "r3.2xlarge"  : { "Arch" : "HVM64"  },
+      "r3.4xlarge"  : { "Arch" : "HVM64"  },
+      "r3.8xlarge"  : { "Arch" : "HVM64"  },
+      "i2.xlarge"   : { "Arch" : "HVM64"  },
+      "i2.2xlarge"  : { "Arch" : "HVM64"  },
+      "i2.4xlarge"  : { "Arch" : "HVM64"  },
+      "i2.8xlarge"  : { "Arch" : "HVM64"  },
+      "d2.xlarge"   : { "Arch" : "HVM64"  },
+      "d2.2xlarge"  : { "Arch" : "HVM64"  },
+      "d2.4xlarge"  : { "Arch" : "HVM64"  },
+      "d2.8xlarge"  : { "Arch" : "HVM64"  },
+      "hi1.4xlarge" : { "Arch" : "HVM64"  },
+      "hs1.8xlarge" : { "Arch" : "HVM64"  },
+      "cr1.8xlarge" : { "Arch" : "HVM64"  },
+      "cc2.8xlarge" : { "Arch" : "HVM64"  }
+    }
+,
+    "AWSRegionArch2AMI" : {
+      "us-east-1"        : {"PV64" : "ami-1ccae774", "HVM64" : "ami-1ecae776", "HVMG2" : "ami-8c6b40e4"},
+      "us-west-2"        : {"PV64" : "ami-ff527ecf", "HVM64" : "ami-e7527ed7", "HVMG2" : "ami-abbe919b"},
+      "us-west-1"        : {"PV64" : "ami-d514f291", "HVM64" : "ami-d114f295", "HVMG2" : "ami-f31ffeb7"},
+      "eu-west-1"        : {"PV64" : "ami-bf0897c8", "HVM64" : "ami-a10897d6", "HVMG2" : "ami-d5bc24a2"},
+      "eu-central-1"     : {"PV64" : "ami-ac221fb1", "HVM64" : "ami-a8221fb5", "HVMG2" : "ami-7cd2ef61"},
+      "ap-northeast-1"   : {"PV64" : "ami-27f90e27", "HVM64" : "ami-cbf90ecb", "HVMG2" : "ami-6318e863"},
+      "ap-southeast-1"   : {"PV64" : "ami-acd9e8fe", "HVM64" : "ami-68d8e93a", "HVMG2" : "ami-3807376a"},
+      "ap-southeast-2"   : {"PV64" : "ami-ff9cecc5", "HVM64" : "ami-fd9cecc7", "HVMG2" : "ami-89790ab3"},
+      "sa-east-1"        : {"PV64" : "ami-bb2890a6", "HVM64" : "ami-b52890a8", "HVMG2" : "NOT_SUPPORTED"},
+      "cn-north-1"       : {"PV64" : "ami-fa39abc3", "HVM64" : "ami-f239abcb", "HVMG2" : "NOT_SUPPORTED"}
+    }
+
+  },
+  
+  "Conditions" : {
+    "CreateCWLForStack" : {"Fn::Equals" : [{"Ref" : "MonitorStack"}, "true"]},
+    "NoKeySpecified" : {"Fn::Equals" : [{"Ref" : "KeyName"}, ""]}
+  },
+
+  "Resources" : {
+      "KCLDDBTable": {
+         "Type": "AWS::DynamoDB::Table",
+         "Properties": {
+        "TableName": { "Ref": "AWS::StackName" },
+          "ProvisionedThroughput" : {
+          "ReadCapacityUnits" : "10",
+          "WriteCapacityUnits" : "10"
+        },
+        "AttributeDefinitions" : [
+          {
+            "AttributeName" : "leaseKey",
+            "AttributeType" : "S"   
+          }
+        ],
+        "KeySchema" : [
+            {
+            "AttributeName" : "leaseKey",
+            "KeyType" : "HASH"
+            }
+        ]
+      }
+       },
+    
+    "KinesisSubscriptionStream": {
+      "Type": "AWS::Kinesis::Stream",
+      "Properties" :  {
+        "ShardCount": { "Ref": "NumberOfKinesisShards" }
+      }
+    },
+
+    "CloudWatchLogsKinesisRole" : {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument" : {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": { 
+                "Service": { "Fn::Join": ["", ["logs.", { "Ref": "AWS::Region" } ,".amazonaws.com" ]]}
+            },
+            "Action": "sts:AssumeRole"
+          }]
+        }
+      }  
+    },
+    
+    "CloudWatchLogsKinesisPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "CloudWatchLogsKinesisPolicy",
+        "Roles": [ { "Ref": "CloudWatchLogsKinesisRole" } ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "kinesis:PutRecord",
+              "Resource": { "Fn::Join" : ["", ["arn:aws:kinesis:", { "Ref": "AWS::Region" }, ":", { "Ref": "AWS::AccountId" }, ":stream/", { "Ref": "KinesisSubscriptionStream"} ]] }
+            },
+            {
+              "Effect": "Allow",
+              "Action": "iam:PassRole",
+              "Resource": { "Fn::Join" : ["", ["arn:aws:iam::", { "Ref": "AWS::AccountId" }, ":role/", { "Ref": "CloudWatchLogsKinesisRole" } ]] }
+            }
+          ]
+        }
+      }
+    },
+
+    "ElasticsearchNodeRole" : {
+      "Type" : "AWS::IAM::Role",
+      "Properties" : {
+        "AssumeRolePolicyDocument" : {
+          "Version" : "2012-10-17",
+          "Statement" : [ {
+            "Effect" : "Allow",
+            "Principal" : {
+              "Service" : [ "ec2.amazonaws.com" ]
+            },
+            "Action" : [ "sts:AssumeRole" ]
+          } ]
+        },
+        "Path" : "/"
+      }
+    },
+
+    "ElasticsearchRolePolicies" : {
+      "Type" : "AWS::IAM::Policy",
+      "Properties" : {
+        "PolicyName" : "elasticsearch-node-policy",
+        "PolicyDocument": {
+          "Version" : "2012-10-17",
+          "Statement": [ {
+              "Effect": "Allow",
+              "Action": "ec2:*",
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": "dynamodb:*",
+              "Resource": { "Fn::Join": ["", ["arn:aws:dynamodb:",{ "Ref": "AWS::Region" },":", {"Ref": "AWS::AccountId"},":table/", { "Ref": "AWS::StackName" } ]]}
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "kinesis:Get*",
+                "kinesis:List*",
+                "kinesis:Describe*"
+              ],
+              "Resource": { "Fn::Join": ["", ["arn:aws:kinesis:", { "Ref": "AWS::Region" }, ":",{"Ref": "AWS::AccountId"},":stream/", { "Ref": "KinesisSubscriptionStream" }]]}
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:*"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": "iam:PassRole",
+              "Resource": { "Fn::Join" : ["", ["arn:aws:iam::", { "Ref": "AWS::AccountId" }, ":role/", { "Ref": "CloudWatchLogsKinesisRole" } ]] }
+            }
+          ]
+        },
+        "Roles": [ { "Ref": "ElasticsearchNodeRole" } ]
+      }
+    },
+
+    "ElasticsearchInstanceProfile" : {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [ { "Ref": "ElasticsearchNodeRole" } ]
+      }
+    },
+    
+    "ElasticsearchSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable Elasticsearch access",
+        "SecurityGroupIngress" : [
+          {
+            "IpProtocol" : "tcp", 
+            "FromPort" : "8080", 
+            "ToPort" : "8080",
+            "SourceSecurityGroupOwnerId" : {"Fn::GetAtt" : ["ElasticsearchELB", "SourceSecurityGroup.OwnerAlias"]},
+            "SourceSecurityGroupName" : {"Fn::GetAtt" : ["ElasticsearchELB", "SourceSecurityGroup.GroupName"]} 
+          },
+          {
+            "IpProtocol" : "tcp", 
+            "FromPort" : "22", 
+            "ToPort" : "22", 
+            "CidrIp" : { "Ref" : "AllowedIpSource" }
+          }
+        ]
+      }
+    },
+    
+    "ElasticsearchELBSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable restricted ELB access",
+        "SecurityGroupIngress" : [
+          {
+            "IpProtocol" : "tcp", 
+            "FromPort" : "80", 
+            "ToPort" : "80",
+            "CidrIp" : { "Ref" : "AllowedIpSource" }
+          }
+        ]
+      }
+    },
+    
+    "ElasticsearchSecurityGroupIngress" : {
+      "Type" : "AWS::EC2::SecurityGroupIngress",
+      "Properties" : {
+        "GroupName" : { "Ref": "ElasticsearchSecurityGroup" },  
+        "IpProtocol" : "tcp", 
+        "FromPort" : "9300", 
+        "ToPort" : "9399", 
+        "SourceSecurityGroupName" : { "Ref" : "ElasticsearchSecurityGroup" } 
+      }
+    },
+
+    "ElasticsearchServerGroup" : {
+      "Type" : "AWS::AutoScaling::AutoScalingGroup",
+      "Properties" : {
+        "AvailabilityZones" : { "Fn::GetAZs" : ""},
+        "LaunchConfigurationName" : { "Ref" : "ElasticsearchServer" },
+        "LoadBalancerNames": [  { "Ref": "ElasticsearchELB" } ],
+        "MinSize" : "1",
+        "MaxSize" : "10",
+        "DesiredCapacity" : { "Ref" : "ClusterSize" },
+        "Tags" : [ { "Key" : "type", "Value" : "elasticsearch", "PropagateAtLaunch" : "true" } ]
+      }
+    },
+    
+    "ElasticsearchELB" : {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties" : {
+        "AvailabilityZones" : { "Fn::GetAZs" : "" },
+        "CrossZone" : "true",
+        "SecurityGroups": [ { "Fn::GetAtt" : [ "ElasticsearchELBSecurityGroup", "GroupId" ] } ],
+        "Listeners" : [ {
+          "LoadBalancerPort" : "80",
+          "InstancePort" : "8080",
+          "Protocol" : "HTTP"
+        } ],
+        "HealthCheck" : {
+          "Target" : "TCP:8080",
+          "HealthyThreshold" : 3,
+          "UnhealthyThreshold" : 2,
+          "Interval": 10,
+          "Timeout": 5
+        }
+      }    
+    },
+    
+    "ElasticsearchLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Condition": "CreateCWLForStack"
+    },
+    
+    "ElasticsearchIndexLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Condition": "CreateCWLForStack"
+    },
+    
+    "ElasticsearchSearchLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Condition": "CreateCWLForStack"
+    },
+    
+    "NginxAccessLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Condition": "CreateCWLForStack"
+    },
+    
+    "NginxErrorLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Condition": "CreateCWLForStack"
+    },
+    
+    "CloudFormationLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Condition": "CreateCWLForStack"
+    },
+    
+    "KCLLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Condition": "CreateCWLForStack"
+    },
+    
+    "ElasticsearchServer": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+
+      "Metadata" : {
+        "AWS::CloudFormation::Init" : {
+          "config" : {
+            "packages": {
+              "yum": {
+                "httpd": [],
+                "nginx": [],
+                "awslogs": []
+              },
+              "rpm": {
+                "elasticsearch-1.6.0": "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.6.0.noarch.rpm"
+              }
+            },
+            "commands" : {
+              "00_moveNginx": {
+                "command": "mv ./nginx.conf /etc/nginx/nginx.conf"
+              }, 
+              "01_updateESConfigForNode": {
+                "command": { "Fn::Join" : ["", [
+                  "echo \"",
+                  "node.name: $(curl -silent http://169.254.169.254/latest/dynamic/instance-identity/document 2>/dev/null ",
+                  "| grep instanceId ",
+                  "| awk -F\\\" '{print $4}')",
+                  "\" >> /etc/elasticsearch/elasticsearch.yml && ",
+                  "echo \"",
+                  "node.rack: $(curl -silent http://169.254.169.254/latest/dynamic/instance-identity/document 2>/dev/null ",
+                  "| grep availabilityZone ",
+                  "| awk -F\\\" '{print $4}')",
+                  "\" >> /etc/elasticsearch/elasticsearch.yml"
+                ]]}
+              },              
+              "02_installESPlugin": {
+                "command": "/usr/share/elasticsearch/bin/plugin -install elasticsearch/elasticsearch-cloud-aws/2.6.0"
+              },               
+              "03_deleteSubscriptionFilter": {
+                "command": { "Fn::Join" : ["", [
+                  "aws logs delete-subscription-filter ",
+                      "--log-group-name \"", { "Ref": "LogGroupName" }, "\" ",
+                      "--region \"", { "Ref" : "AWS::Region" }, "\" ",
+                      "--filter-name $(aws logs describe-subscription-filters ",
+                      "--log-group-name ", { "Ref": "LogGroupName" }, " ",
+                      "--region ", { "Ref": "AWS::Region" }, " ",
+                      "--filter-name-prefix \"cwl-cfn-es-\" ",
+                      "| grep filterName | awk -F \\\" '{ print $4 };' )"
+                ]]},
+                "ignoreErrors": true
+              },
+              "04_putSubscriptionFilter": {
+                "command": { "Fn::Join": ["", [
+                  "aws logs put-subscription-filter ",
+                      "--log-group-name \"", { "Ref": "LogGroupName" }, "\" ",
+                      "--filter-name \"cwl-cfn-es-", { "Ref": "KinesisSubscriptionStream" }, "\" ",
+                      "--filter-pattern \"", { "Ref": "SubscriptionFilterPattern" },"\" ",
+                      "--region \"", { "Ref" : "AWS::Region" }, "\" ",
+                      "--destination-arn \"", 
+                      "arn:aws:kinesis:", { "Ref": "AWS::Region" }, 
+                      ":", { "Ref": "AWS::AccountId" }, 
+                      ":stream/", { "Ref": "KinesisSubscriptionStream"} ,"\" ",
+                      "--role-arn \"", 
+                      "arn:aws:iam::", { "Ref": "AWS::AccountId" }, 
+                      ":role/", { "Ref": "CloudWatchLogsKinesisRole" },"\""
+                 ]]}
+              }, 
+              "05_nginxAuthConfig": {
+                "command": { "Fn::Join" : ["", [ 
+                  "htpasswd -c -b /etc/nginx/.htpasswd ", 
+                  { "Ref": "NginxUsername" }, " ", 
+                  { "Ref": "NginxPassword" }, "\n"
+                 ]]}                 
+              },
+              "06_startKCL": {
+                "command": { "Fn::Join" : ["", [
+                  "{ nohup java -DkinesisInputStream=", { "Ref": "KinesisSubscriptionStream" },
+                    " -DregionName=", { "Ref": "AWS::Region" },
+                    " -DappName=", { "Ref": "KCLDDBTable" }, 
+                    " -DelasticsearchClusterName=elasticsearch",
+                    " -jar cloudwatch-logs-subscription-consumer-1.0.0.jar",
+                    " > /dev/null 2>&1 & } && disown -h %1"
+                  ]]},
+                "cwd": "~"
+              },
+              "07_getPipAndCurator": {
+                "command": "python get-pip.py && /usr/local/bin/pip install elasticsearch-curator",
+                "cwd": "/pipstuff"
+              },
+              "08_CWLStateDir" : {
+                "command" : "mkdir -p /var/awslogs/state"
+              }
+            },
+            
+            "files": {
+              "/etc/elasticsearch/elasticsearch.yml" : {
+                "content" : { "Fn::Join" : ["", [
+                  "cloud.aws.region:\n",
+                  " ", { "Ref" : "AWS::Region" }, "\n",
+                  "discovery:\n",
+                  " type: ec2\n",
+                  "\n",
+                  "discovery.ec2.groups: ", { "Ref" : "ElasticsearchSecurityGroup" }, "\n",
+                  "discovery.ec2.tag.type: elasticsearch\n",
+                  "\n",
+                  "cloud.node.auto_attributes: true\n"
+                ]]}
+              },
+              "/etc/logrotate.d/elasticsearch": {
+                   "content": { "Fn::Join" : ["", [
+                  "/var/log/elasticsearch/elasticsearch_index_indexing_slowlog.log\n",
+                  "/var/log/elasticsearch/elasticsearch_index_search_slowlog.log\n",
+                  "/var/log/elasticsearch/elasticsearch.log\n",
+                  "{\n",
+                  "    daily\n",
+                  "    rotate 5\n",
+                  "    copytruncate\n",
+                  "    dateext\n",
+                  "    compress\n",
+                  "}\n"
+                ]]}
+              },
+              "/etc/logrotate.d/nginx": {
+                   "content": { "Fn::Join" : ["", [
+                  "/var/log/nginx/access.log\n",
+                  "/var/log/nginx/error.log\n",                  
+                  "{\n",
+                  "    daily\n",
+                  "    rotate 5\n",
+                  "    copytruncate\n",
+                  "    dateext\n",
+                  "    compress\n",
+                  "}\n"
+                ]]}
+              },
+              "/etc/logrotate.d/cloudwatch-logs-subscription-consumer": {
+                   "content": { "Fn::Join" : ["", [
+                  "/var/log/cloudwatch-logs-subscription-consumer.log\n",                  
+                  "{\n",
+                  "    daily\n",
+                  "    rotate 5\n",
+                  "    copytruncate\n",
+                  "    dateext\n",
+                  "    compress\n",
+                  "}\n"
+                ]]}
+              },                 
+              "/etc/awslogs/awscli.conf": {
+                   "content": { "Fn::Join" : ["", [
+                  "[plugins]\n",
+                  "cwlogs = cwlogs\n",
+                  "[default]\n",
+                  "region = ", { "Ref": "AWS::Region"} ,"\n"
+                ]]}
+              },
+              "/pipstuff/get-pip.py": {
+                "source": "https://bootstrap.pypa.io/get-pip.py"
+              },
+              "/etc/awslogs/awslogs.conf": {
+                "Fn::If": [
+                  "CreateCWLForStack",
+                  {
+                    "content": { "Fn::Join": [ "", [
+                       "[general]\n",
+                       "state_file= /var/awslogs/state/agent-state\n",
+
+                      "[/var/log/cfn-init.log]\n",
+                      "file = /var/log/cfn-init.log\n",
+                      "log_group_name = ", { "Ref": "CloudFormationLogs" }, "\n",
+                      "log_stream_name = {instance_id}\n",
+                   
+                      "[/var/log/elasticsearch/elasticsearch.log]\n",
+                      "file = /var/log/elasticsearch/elasticsearch.log\n",
+                      "log_group_name = ", { "Ref": "ElasticsearchLogs" }, "\n",
+                      "log_stream_name = {instance_id}\n",
+                         
+                      "[/var/log/elasticsearch/elasticsearch_index_indexing_slowlog.log]\n",
+                      "file = /var/log/elasticsearch/elasticsearch_index_indexing_slowlog.log\n",
+                      "log_group_name = ", { "Ref": "ElasticsearchIndexLogs" }, "\n",
+                      "log_stream_name = {instance_id}\n",
+                      
+                      "[/var/log/elasticsearch/elasticsearch_index_search_slowlog]\n",
+                      "file = /var/log/elasticsearch/elasticsearch_index_search_slowlog\n",
+                      "log_group_name = ", { "Ref": "ElasticsearchSearchLogs" }, "\n",
+                      "log_stream_name = {instance_id}\n",
+                      
+                      "[/var/log/nginx/access.log]\n",
+                      "file = /var/log/nginx/access.log\n",
+                      "log_group_name = ", { "Ref": "NginxAccessLogs" }, "\n",
+                      "log_stream_name = {instance_id}\n",
+                      
+                      "[/var/log/nginx/error.log]\n",
+                      "file = /var/log/nginx/error.log\n",
+                      "log_group_name = ", { "Ref": "NginxErrorLogs" }, "\n",
+                      "log_stream_name = {instance_id}\n",
+                      
+                      "[/var/log/cloudwatch-logs-subscription-consumer.log]\n",
+                      "file = /var/log/cloudwatch-logs-subscription-consumer.log\n",
+                      "log_group_name = ", { "Ref": "KCLLogs" }, "\n",
+                      "log_stream_name = {instance_id}\n"
+                   ]]},
+                   "mode": "000444",
+                   "owner": "root",
+                   "group": "root"
+                   },
+                 {
+                   "content": "# Find original defaults in .bak file"
+                 }
+                ]
+              } 
+            },
+            
+            "services": {
+              "sysvinit": {
+                "nginx": {
+                  "enabled": true,
+                  "ensureRunning": true,
+                  "files": [ "/etc/nginx/nginx.conf" ],
+                  "sources": [ "usr/share/nginx/html" ]
+                },
+                "elasticsearch": {
+                  "enabled": true,
+                  "ensureRunning": true,
+                  "files": [ "/etc/elasticsearch/elasticsearch.yml", "/etc/elasticsearch/logging.yml", "/etc/sysconfig/elasticsearch" ],
+                  "sources": [ "/usr/share/elasticsearch/bin" ]
+                },
+                "awslogs": {
+                  "Fn::If": [
+                    "CreateCWLForStack",
+                    {
+                      "enabled" : "true", 
+                         "ensureRunning" : "true",
+                        "files" : [ "/etc/awslogs/awslogs.conf" ]
+                    },
+                    "AWS::NoValue"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "Properties": {
+        "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" }, { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] } ] },
+        "InstanceType"   : { "Ref" : "InstanceType" },
+        "SecurityGroups" : [ {"Ref" : "ElasticsearchSecurityGroup"} ],
+        "KeyName"        : { "Ref" : "KeyName" },
+        "IamInstanceProfile" : { "Ref" : "ElasticsearchInstanceProfile" },
+        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+          "#!/bin/bash\n",
+          "yum update -y aws-cfn-bootstrap\n",
+          "yum update -y aws-cli\n",
+          
+          "# Helper function\n",
+          "function error_exit\n",
+          "{\n",
+          "  /opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "WaitHandle" }, "'\n",
+          "  exit 1\n",
+          "}\n",
+            
+          "cd ~ \n",
+                  
+          "# KCL \n",
+          "wget https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/cwl-elasticsearch-cf-stack-1.0.0.zip || error_exit \"Failed to get cf package\" \n",
+          "unzip cwl-elasticsearch-cf-stack-1.0.0.zip || error_exit \"Failed to unzip cf package\" \n",
+          "unzip cloudwatch-logs-subscription-consumer-1.0.0.zip || error_exit \"Failed to unzip KCL\" \n",
+         
+       
+          "# Config\n",
+          "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r ElasticsearchServer ",
+          "    --region ", { "Ref" : "AWS::Region" }, " -v || error_exit \"failed to run cfn-init\"\n",
+
+          
+          "# Allow 512m heap size for cluster \n",
+          "sed -i 's/#ES_HEAP_SIZE=.*/ES_HEAP_SIZE=512m/g' /etc/sysconfig/elasticsearch || error_exit \"Failed to set heap config\" \n",
+           
+          "# Get kibana\n",
+          "wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.2.zip || error_exit \"Failed to get kibana\" \n",
+          "unzip kibana-3.1.2.zip || error_exit \"Kibana unzip failed\" \n",
+          "mv kibana-3.1.2 /usr/share/nginx/html/ || error_exit \"Failed to move kibana config\" \n",
+          "sed -i 's/elasticsearch:.*/elasticsearch: \"http:\\/\\/\" + window.location.hostname + \"\\/es\\/\",/g' /usr/share/nginx/html/kibana-3.1.2/config.js || error_exit \"Failed to change kibana config\"\n",
+                    
+          "# Set cron for clean up \n",
+          "echo \"0 * * * * /usr/local/bin/curator --host localhost --port 9200 --debug delete indices --prefix \\\"cwl-\\\" --time-unit days --older-than ",
+          { "Ref" : "RetentionDays" },
+          " --timestring \\\"\\%Y.\\%m.\\%d\\\"\" >> mycron || error_exit \"Failed to create cron file\" \n",
+
+          "crontab mycron && rm -f mycron || error_exit \"Failed to set cron \" \n",
+
+          "# Signal success\n",
+          "/opt/aws/bin/cfn-signal -e $? '", { "Ref" : "WaitHandle" }, "'\n"
+        ]]}}
+      }
+    },
+
+    "WaitHandle" : {
+      "Type" : "AWS::CloudFormation::WaitConditionHandle"
+    },
+
+    "WaitCondition" : {
+      "Type" : "AWS::CloudFormation::WaitCondition",
+      "DependsOn" : "ElasticsearchServer",
+      "Properties" : {
+        "Handle" : {"Ref" : "WaitHandle"},
+        "Timeout" : "600"
+      }
+    }
+  },
+  "Outputs" : {
+    "URL" : {
+      "Description" : "Kibana URL",
+      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticsearchELB", "DNSName" ]}]]}
+    }
+  }
+}
