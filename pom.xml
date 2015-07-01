@@ -15,6 +15,50 @@
         </license>
     </licenses>
 
+    <profiles>
+        
+        <profile>
+            <id>Stdout</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>connectorDestination</name>
+                    <value>stdout</value>
+                </property>
+            </activation>
+            <properties>
+                <connector.mainclass>com.amazonaws.services.logs.connectors.samples.stdout.StdoutConnector</connector.mainclass>
+            </properties>
+        </profile>
+        
+        <profile>
+            <id>Elasticsearch</id>
+            <activation>
+                <property>
+                    <name>connectorDestination</name>
+                    <value>elasticsearch</value>
+                </property>
+            </activation>
+            <properties>
+                <connector.mainclass>com.amazonaws.services.logs.connectors.samples.elasticsearch.ElasticsearchConnector</connector.mainclass>
+            </properties>
+        </profile>
+        
+        <profile>
+            <id>S3</id>
+            <activation>
+                <property>
+                    <name>connectorDestination</name>
+                    <value>s3</value>
+                </property>
+            </activation>
+            <properties>
+                <connector.mainclass>com.amazonaws.services.logs.connectors.samples.s3.S3Connector</connector.mainclass>
+            </properties>
+        </profile>
+        
+    </profiles>
+    
     <dependencies>
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -96,7 +140,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
                 <configuration>
-                    <mainClass>com.amazonaws.services.logs.connectors.samples.elasticsearch.ElasticsearchConnector</mainClass>
+                    <mainClass>${connector.mainclass}</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -128,7 +172,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.amazonaws.services.logs.connectors.samples.elasticsearch.ElasticsearchConnector</mainClass>
+                            <mainClass>${connector.mainclass}</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
