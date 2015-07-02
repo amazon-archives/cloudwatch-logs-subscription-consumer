@@ -394,16 +394,6 @@
       "Condition": "CreateCWLForStack"
     },
     
-    "ElasticsearchIndexLogs": {
-      "Type": "AWS::Logs::LogGroup",
-      "Condition": "CreateCWLForStack"
-    },
-    
-    "ElasticsearchSearchLogs": {
-      "Type": "AWS::Logs::LogGroup",
-      "Condition": "CreateCWLForStack"
-    },
-    
     "NginxAccessLogs": {
       "Type": "AWS::Logs::LogGroup",
       "Condition": "CreateCWLForStack"
@@ -597,16 +587,6 @@
                       "[/var/log/elasticsearch/elasticsearch.log]\n",
                       "file = /var/log/elasticsearch/elasticsearch.log\n",
                       "log_group_name = ", { "Ref": "ElasticsearchLogs" }, "\n",
-                      "log_stream_name = {instance_id}\n",
-                         
-                      "[/var/log/elasticsearch/elasticsearch_index_indexing_slowlog.log]\n",
-                      "file = /var/log/elasticsearch/elasticsearch_index_indexing_slowlog.log\n",
-                      "log_group_name = ", { "Ref": "ElasticsearchIndexLogs" }, "\n",
-                      "log_stream_name = {instance_id}\n",
-                      
-                      "[/var/log/elasticsearch/elasticsearch_index_search_slowlog]\n",
-                      "file = /var/log/elasticsearch/elasticsearch_index_search_slowlog\n",
-                      "log_group_name = ", { "Ref": "ElasticsearchSearchLogs" }, "\n",
                       "log_stream_name = {instance_id}\n",
                       
                       "[/var/log/nginx/access.log]\n",
