@@ -697,8 +697,10 @@
           "    --region ", { "Ref" : "AWS::Region" }, " -v || error_exit \"failed to run cfn-init\"\n",
 
           
-          "# Allow 512m heap size for cluster \n",
-          "sed -i 's/#ES_HEAP_SIZE=.*/ES_HEAP_SIZE=512m/g' /etc/sysconfig/elasticsearch || error_exit \"Failed to set heap config\" \n",
+          "# Allow 60% of total mem as heap size for cluster \n",
+          "freemem=$(free -m | grep Mem | awk '{ printf \"%1.0f\\n\", 0.6*$2; }')",
+          " && sed -i \"s/#ES_HEAP_SIZE=.*/ES_HEAP_SIZE=$(echo $freemem)m/g\" /etc/sysconfig/elasticsearch",
+          " || error_exit \"Failed to change heap size for es \" \n",
            
           "# Get kibana\n",
           "wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.2.zip || error_exit \"Failed to get kibana\" \n",
