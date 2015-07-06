@@ -512,7 +512,8 @@
                 "command": { "Fn::Join" : ["", [
                   "{ nohup java -DkinesisInputStream=", { "Ref": "KinesisSubscriptionStream" },
                     " -DregionName=", { "Ref": "AWS::Region" },
-                    " -DappName=", { "Ref": "KCLLeasesTable" }, 
+                    " -DappName=", { "Ref": "KCLLeasesTable" },
+                    " -Dlog4j.configuration=log4j-prod.properties",
                     " -DelasticsearchClusterName=elasticsearch",
                     " -jar cloudwatch-logs-subscription-consumer-1.0.0/cloudwatch-logs-subscription-consumer-1.0.0.jar",
                     " > /dev/null 2>&1 & } && disown -h %1"
