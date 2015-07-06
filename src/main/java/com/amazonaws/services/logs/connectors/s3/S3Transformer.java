@@ -26,7 +26,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- *
  * Transforms CloudWatchLogsEvent objects to JSON.
  */
 public class S3Transformer extends CloudWatchLogsSubscriptionTransformer<byte[]> {

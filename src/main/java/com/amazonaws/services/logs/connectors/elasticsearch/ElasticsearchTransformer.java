@@ -28,6 +28,9 @@ import com.amazonaws.services.logs.subscriptions.CloudWatchLogsSubscriptionTrans
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Transforms CloudWatchLogsEvent records to ElasticsearchObject records.
+ */
 public class ElasticsearchTransformer extends CloudWatchLogsSubscriptionTransformer<ElasticsearchObject> {
 
     private static final Log LOG = LogFactory.getLog(ElasticsearchTransformer.class);

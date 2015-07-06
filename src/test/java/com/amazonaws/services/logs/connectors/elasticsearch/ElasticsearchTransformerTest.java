@@ -157,4 +157,67 @@ public class ElasticsearchTransformerTest {
         assertEquals("Root", sourceNode.get("$").get("userIdentity").get("type").asText());
         assertEquals("cloudtrail.amazonaws.com", sourceNode.get("$").get("eventSource").asText());
     }
+
+    @Test
+    public void transformLambdaLog() throws IOException {
+        ElasticsearchTransformer classUnderTest = new ElasticsearchTransformer();
+
+        // load the example events
+        byte[] data = TestUtils.getCompressedTestFile("/aws-lambda-log-example.json");
+
+        // execute
+        List<CloudWatchLogsEvent> logEvents = new ArrayList<>(
+                classUnderTest.toClass(new Record().withData(ByteBuffer.wrap(data))));
+
+        List<ElasticsearchObject> elasticsearchDocuments = new ArrayList<>();
+
+        for (CloudWatchLogsEvent logEvent : logEvents) {
+            elasticsearchDocuments.add(classUnderTest.fromClass(logEvent));
+        }
+
+        // verify
+        assertEquals("49545295115971876468408574808414755329919666212443258898", elasticsearchDocuments.get(0).getId());
+        assertEquals("49545295115971876468408574808465530214343150403450640305", elasticsearchDocuments.get(1).getId());
+
+        assertEquals("cwl-2015.01.13", elasticsearchDocuments.get(0).getIndex());
+        assertEquals("cwl-2015.01.13", elasticsearchDocuments.get(1).getIndex());
+
+        assertEquals("/aws/lambda/HelloWorld", elasticsearchDocuments.get(0).getType());
+        assertEquals("/aws/lambda/HelloWorld", elasticsearchDocuments.get(1).getType());
+
+        JsonNode sourceNode;
+
+        // event 1
+        sourceNode = JSON_OBJECT_MAPPER.readTree(new StringReader(elasticsearchDocuments.get(0).getSource()));
+
+        assertEquals("49545295115971876468408574808414755329919666212443258898", sourceNode.get("@id").asText());
+        assertEquals(1421116133213L, sourceNode.get("@timestamp").asLong());
+        assertEquals("123456789012", sourceNode.get("@owner").asText());
+        assertEquals("/aws/lambda/HelloWorld", sourceNode.get("@log_group").asText());
+        assertEquals("2015/06/30/1f77bc4743204b22b0d42cf3b85f40c7", sourceNode.get("@log_stream").asText());
+        assertEquals(
+                "2015-01-13T02:28:53.213Z c342155b-1ec0-11e5-b0e2-f317438eb2f6 { \"key1\": 100, \"key2\": \"value\", \"key3\": { \"key4\": \"level2\" } }",
+                sourceNode.get("@message").asText());
+
+        assertEquals("2015-01-13T02:28:53.213Z", sourceNode.get("$").get("timestamp").asText());
+        assertEquals("c342155b-1ec0-11e5-b0e2-f317438eb2f6", sourceNode.get("$").get("request_id").asText());
+        assertEquals(100, sourceNode.get("$").get("event").get("key1").asLong());
+        assertEquals("value", sourceNode.get("$").get("event").get("key2").asText());
+        assertEquals("level2", sourceNode.get("$").get("event").get("key3").get("key4").asText());
+
+        // event 2
+        sourceNode = JSON_OBJECT_MAPPER.readTree(new StringReader(elasticsearchDocuments.get(1).getSource()));
+
+        assertEquals("49545295115971876468408574808465530214343150403450640305", sourceNode.get("@id").asText());
+        assertEquals(1421116143456L, sourceNode.get("@timestamp").asLong());
+        assertEquals("123456789012", sourceNode.get("@owner").asText());
+        assertEquals("/aws/lambda/HelloWorld", sourceNode.get("@log_group").asText());
+        assertEquals("2015/06/30/1f77bc4743204b22b0d42cf3b85f40c7", sourceNode.get("@log_stream").asText());
+        assertEquals("2015-01-13T02:29:03.456Z c342155b-1ec0-11e5-b0e2-f317438eb2f6 Hello World",
+                sourceNode.get("@message").asText());
+
+        assertEquals("2015-01-13T02:29:03.456Z", sourceNode.get("$").get("timestamp").asText());
+        assertEquals("c342155b-1ec0-11e5-b0e2-f317438eb2f6", sourceNode.get("$").get("request_id").asText());
+        assertEquals("Hello World", sourceNode.get("$").get("event").asText());
+    }
 }

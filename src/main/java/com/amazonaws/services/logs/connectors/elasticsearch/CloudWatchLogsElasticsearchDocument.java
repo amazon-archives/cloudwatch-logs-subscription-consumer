@@ -14,7 +14,6 @@
  */
 package com.amazonaws.services.logs.connectors.elasticsearch;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -28,8 +27,6 @@ import com.amazonaws.util.json.JSONObject;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Defines the log event structure that would be sent to Elasticsearch.
@@ -38,8 +35,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CloudWatchLogsElasticsearchDocument implements Serializable {
 
     private static final long serialVersionUID = -8898041979675208782L;
-
-    private static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper();
 
     private static final Log LOG = LogFactory.getLog(CloudWatchLogsElasticsearchDocument.class);
 
@@ -80,9 +75,17 @@ public class CloudWatchLogsElasticsearchDocument implements Serializable {
                     String fieldName = entry.getKey();
                     String value = entry.getValue();
 
-                    if (StringUtils.isNumeric(value)) {
+                    if (value == null) {
+                        // nothing to add
+                        continue;
+                    } else if (ElasticsearchTransformerUtils.isMessageValidJson(value)) {
+                        // the field value is valid json - put it as a nested object
+                        extractedFieldsInJson.put(fieldName, new JSONObject(value));
+                    } else if (StringUtils.isNumeric(value)) {
+                        // the field value is a number - put it as a double
                         extractedFieldsInJson.put(fieldName, Double.parseDouble(value));
                     } else {
+                        // else put the field as a string
                         extractedFieldsInJson.put(fieldName, value);
                     }
                 }
@@ -95,22 +98,12 @@ public class CloudWatchLogsElasticsearchDocument implements Serializable {
         }
 
         // if the message is valid JSON, use the message as is for Elasticsearch fields
-        if (isMessageValidJson(message)) {
+        if (ElasticsearchTransformerUtils.isMessageValidJson(message)) {
             return message;
         }
 
         // if there are no extractedFields and the message is not valid JSON, don't emit any Elasticsearch fields
         return null;
-    }
-
-    public static boolean isMessageValidJson(String message) {
-
-        try {
-            JSON_OBJECT_MAPPER.readTree(message);
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
     }
 
     @JsonProperty("@id")
@@ -147,42 +140,5 @@ public class CloudWatchLogsElasticsearchDocument implements Serializable {
     @JsonProperty("@log_stream")
     public String getLogStream() {
         return logStream;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public void setFields(String fields) {
-        this.fields = fields;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public void setLogGroup(String logGroup) {
-        this.logGroup = logGroup;
-    }
-
-    public void setLogStream(String logStream) {
-        this.logStream = logStream;
-    }
-
-    @Override
-    public String toString() {
-        try {
-            return new ObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            return super.toString();
-        }
     }
 }

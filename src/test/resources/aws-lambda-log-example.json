@@ -1,0 +1,31 @@
+{
+    "messageType": "DATA_MESSAGE",
+    "owner": "123456789012",
+    "logGroup": "/aws/lambda/HelloWorld",
+    "logStream": "2015/06/30/1f77bc4743204b22b0d42cf3b85f40c7",
+    "subscriptionFilters": [
+        "function-logs"
+    ],
+    "logEvents": [
+        {
+            "id": "49545295115971876468408574808414755329919666212443258898",
+            "timestamp": "1421116133213",
+            "message": "2015-01-13T02:28:53.213Z c342155b-1ec0-11e5-b0e2-f317438eb2f6 { \"key1\": 100, \"key2\": \"value\", \"key3\": { \"key4\": \"level2\" } }",
+            "extractedFields": {
+                "timestamp": "2015-01-13T02:28:53.213Z",
+                "request_id": "c342155b-1ec0-11e5-b0e2-f317438eb2f6",
+                "event": "{ \"key1\": 100, \"key2\": \"value\", \"key3\": { \"key4\": \"level2\" } }"
+            }
+        },
+        { 
+            "id": "49545295115971876468408574808465530214343150403450640305",
+            "timestamp": "1421116143456",
+            "message": "2015-01-13T02:29:03.456Z c342155b-1ec0-11e5-b0e2-f317438eb2f6 Hello World",
+            "extractedFields": {
+                "timestamp": "2015-01-13T02:29:03.456Z",
+                "request_id": "c342155b-1ec0-11e5-b0e2-f317438eb2f6",
+                "event": "Hello World"
+            }
+        }
+    ]
+}
