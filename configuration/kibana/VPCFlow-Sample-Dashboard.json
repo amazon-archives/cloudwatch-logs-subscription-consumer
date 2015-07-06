@@ -1,0 +1,1674 @@
+{
+  "title": "VPC Flow Dashboard",
+  "services": {
+    "query": {
+      "list": {
+        "0": {
+          "query": "$.action:REJECT",
+          "alias": "REJECT",
+          "color": "#E24D42",
+          "id": 0,
+          "pin": true,
+          "type": "lucene",
+          "enable": true
+        },
+        "1": {
+          "id": 1,
+          "color": "#7EB26D",
+          "alias": "ACCEPT",
+          "pin": true,
+          "type": "lucene",
+          "enable": true,
+          "query": "$.action:ACCEPT"
+        },
+        "2": {
+          "id": 2,
+          "color": "#447EBC",
+          "alias": "TOTAL",
+          "pin": true,
+          "type": "lucene",
+          "enable": true,
+          "query": "$.action:*"
+        }
+      },
+      "ids": [
+        0,
+        1,
+        2
+      ]
+    },
+    "filter": {
+      "list": {
+        "0": {
+          "type": "time",
+          "field": "@timestamp",
+          "from": "now-1h",
+          "to": "now",
+          "mandate": "must",
+          "active": true,
+          "alias": "",
+          "id": 0
+        }
+      },
+      "ids": [
+        0
+      ]
+    }
+  },
+  "rows": [
+    {
+      "title": "Info",
+      "height": "20px",
+      "editable": true,
+      "collapse": false,
+      "collapsable": true,
+      "panels": [
+        {
+          "error": false,
+          "span": 4,
+          "editable": false,
+          "type": "text",
+          "loadingEditor": false,
+          "mode": "markdown",
+          "content": "",
+          "style": {},
+          "title": "TOTAL"
+        },
+        {
+          "error": false,
+          "span": 4,
+          "editable": false,
+          "type": "text",
+          "loadingEditor": false,
+          "mode": "markdown",
+          "content": "",
+          "style": {},
+          "title": "ACCEPT"
+        },
+        {
+          "error": false,
+          "span": 4,
+          "editable": false,
+          "type": "text",
+          "loadingEditor": false,
+          "mode": "markdown",
+          "content": "",
+          "style": {},
+          "title": "REJECT"
+        }
+      ],
+      "notice": false
+    },
+    {
+      "title": "Metrics",
+      "height": "150px",
+      "editable": true,
+      "collapse": false,
+      "collapsable": true,
+      "panels": [
+        {
+          "span": 4,
+          "editable": true,
+          "type": "histogram",
+          "loadingEditor": false,
+          "mode": "total",
+          "time_field": "@timestamp",
+          "value_field": "$.bytes",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_format": "bytes",
+          "grid": {
+            "max": null,
+            "min": 0
+          },
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              2
+            ]
+          },
+          "annotate": {
+            "enable": false,
+            "query": "*",
+            "size": 20,
+            "field": "_type",
+            "sort": [
+              "_score",
+              "desc"
+            ]
+          },
+          "auto_int": true,
+          "resolution": 100,
+          "interval": "30s",
+          "intervals": [
+            "auto",
+            "1s",
+            "1m",
+            "5m",
+            "10m",
+            "30m",
+            "1h",
+            "3h",
+            "12h",
+            "1d",
+            "1w",
+            "1y"
+          ],
+          "lines": true,
+          "fill": 0,
+          "linewidth": 2,
+          "points": false,
+          "pointradius": 2,
+          "bars": false,
+          "stack": false,
+          "spyable": true,
+          "zoomlinks": false,
+          "options": false,
+          "legend": false,
+          "show_query": false,
+          "interactive": true,
+          "legend_counts": false,
+          "timezone": "browser",
+          "percentage": false,
+          "zerofill": true,
+          "derivative": false,
+          "tooltip": {
+            "value_type": "individual",
+            "query_as_alias": true
+          },
+          "title": "Bytes - Total"
+        },
+        {
+          "span": 4,
+          "editable": true,
+          "type": "histogram",
+          "loadingEditor": false,
+          "mode": "total",
+          "time_field": "@timestamp",
+          "value_field": "$.bytes",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_format": "bytes",
+          "grid": {
+            "max": null,
+            "min": 0
+          },
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "annotate": {
+            "enable": false,
+            "query": "*",
+            "size": 20,
+            "field": "_type",
+            "sort": [
+              "_score",
+              "desc"
+            ]
+          },
+          "auto_int": true,
+          "resolution": 100,
+          "interval": "30s",
+          "intervals": [
+            "auto",
+            "1s",
+            "1m",
+            "5m",
+            "10m",
+            "30m",
+            "1h",
+            "3h",
+            "12h",
+            "1d",
+            "1w",
+            "1y"
+          ],
+          "lines": true,
+          "fill": 0,
+          "linewidth": 2,
+          "points": false,
+          "pointradius": 2,
+          "bars": false,
+          "stack": false,
+          "spyable": true,
+          "zoomlinks": false,
+          "options": false,
+          "legend": false,
+          "show_query": false,
+          "interactive": true,
+          "legend_counts": false,
+          "timezone": "browser",
+          "percentage": false,
+          "zerofill": true,
+          "derivative": false,
+          "tooltip": {
+            "value_type": "individual",
+            "query_as_alias": true
+          },
+          "title": "Bytes - ACCEPT"
+        },
+        {
+          "span": 4,
+          "editable": true,
+          "type": "histogram",
+          "loadingEditor": false,
+          "mode": "total",
+          "time_field": "@timestamp",
+          "value_field": "$.bytes",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_format": "bytes",
+          "grid": {
+            "max": null,
+            "min": 0
+          },
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "annotate": {
+            "enable": false,
+            "query": "*",
+            "size": 20,
+            "field": "_type",
+            "sort": [
+              "_score",
+              "desc"
+            ]
+          },
+          "auto_int": true,
+          "resolution": 100,
+          "interval": "30s",
+          "intervals": [
+            "auto",
+            "1s",
+            "1m",
+            "5m",
+            "10m",
+            "30m",
+            "1h",
+            "3h",
+            "12h",
+            "1d",
+            "1w",
+            "1y"
+          ],
+          "lines": true,
+          "fill": 0,
+          "linewidth": 2,
+          "points": false,
+          "pointradius": 2,
+          "bars": false,
+          "stack": false,
+          "spyable": true,
+          "zoomlinks": false,
+          "options": false,
+          "legend": false,
+          "show_query": false,
+          "interactive": true,
+          "legend_counts": false,
+          "timezone": "browser",
+          "percentage": false,
+          "zerofill": true,
+          "derivative": false,
+          "tooltip": {
+            "value_type": "individual",
+            "query_as_alias": true
+          },
+          "title": "Bytes - REJECT"
+        },
+        {
+          "span": 4,
+          "editable": true,
+          "type": "histogram",
+          "loadingEditor": false,
+          "mode": "total",
+          "time_field": "@timestamp",
+          "value_field": "$.packets",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_format": "none",
+          "grid": {
+            "max": null,
+            "min": 0
+          },
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              2
+            ]
+          },
+          "annotate": {
+            "enable": false,
+            "query": "*",
+            "size": 20,
+            "field": "_type",
+            "sort": [
+              "_score",
+              "desc"
+            ]
+          },
+          "auto_int": true,
+          "resolution": 100,
+          "interval": "30s",
+          "intervals": [
+            "auto",
+            "1s",
+            "1m",
+            "5m",
+            "10m",
+            "30m",
+            "1h",
+            "3h",
+            "12h",
+            "1d",
+            "1w",
+            "1y"
+          ],
+          "lines": true,
+          "fill": 0,
+          "linewidth": 2,
+          "points": false,
+          "pointradius": 2,
+          "bars": false,
+          "stack": false,
+          "spyable": true,
+          "zoomlinks": false,
+          "options": false,
+          "legend": false,
+          "show_query": false,
+          "interactive": true,
+          "legend_counts": false,
+          "timezone": "browser",
+          "percentage": false,
+          "zerofill": true,
+          "derivative": false,
+          "tooltip": {
+            "value_type": "individual",
+            "query_as_alias": true
+          },
+          "title": "Packets - Total"
+        },
+        {
+          "span": 4,
+          "editable": true,
+          "type": "histogram",
+          "loadingEditor": false,
+          "mode": "total",
+          "time_field": "@timestamp",
+          "value_field": "$.packets",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_format": "none",
+          "grid": {
+            "max": null,
+            "min": 0
+          },
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "annotate": {
+            "enable": false,
+            "query": "*",
+            "size": 20,
+            "field": "_type",
+            "sort": [
+              "_score",
+              "desc"
+            ]
+          },
+          "auto_int": true,
+          "resolution": 100,
+          "interval": "30s",
+          "intervals": [
+            "auto",
+            "1s",
+            "1m",
+            "5m",
+            "10m",
+            "30m",
+            "1h",
+            "3h",
+            "12h",
+            "1d",
+            "1w",
+            "1y"
+          ],
+          "lines": true,
+          "fill": 0,
+          "linewidth": 2,
+          "points": false,
+          "pointradius": 2,
+          "bars": false,
+          "stack": false,
+          "spyable": true,
+          "zoomlinks": false,
+          "options": false,
+          "legend": false,
+          "show_query": false,
+          "interactive": true,
+          "legend_counts": false,
+          "timezone": "browser",
+          "percentage": false,
+          "zerofill": true,
+          "derivative": false,
+          "tooltip": {
+            "value_type": "individual",
+            "query_as_alias": true
+          },
+          "title": "Packets - ACCEPT"
+        },
+        {
+          "span": 4,
+          "editable": true,
+          "type": "histogram",
+          "loadingEditor": false,
+          "mode": "total",
+          "time_field": "@timestamp",
+          "value_field": "$.packets",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_format": "none",
+          "grid": {
+            "max": null,
+            "min": 0
+          },
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "annotate": {
+            "enable": false,
+            "query": "*",
+            "size": 20,
+            "field": "_type",
+            "sort": [
+              "_score",
+              "desc"
+            ]
+          },
+          "auto_int": true,
+          "resolution": 100,
+          "interval": "30s",
+          "intervals": [
+            "auto",
+            "1s",
+            "1m",
+            "5m",
+            "10m",
+            "30m",
+            "1h",
+            "3h",
+            "12h",
+            "1d",
+            "1w",
+            "1y"
+          ],
+          "lines": true,
+          "fill": 0,
+          "linewidth": 2,
+          "points": false,
+          "pointradius": 2,
+          "bars": false,
+          "stack": false,
+          "spyable": true,
+          "zoomlinks": false,
+          "options": false,
+          "legend": false,
+          "show_query": false,
+          "interactive": true,
+          "legend_counts": false,
+          "timezone": "browser",
+          "percentage": false,
+          "zerofill": true,
+          "derivative": false,
+          "tooltip": {
+            "value_type": "individual",
+            "query_as_alias": true
+          },
+          "title": "Packets - REJECT"
+        }
+      ],
+      "notice": false
+    },
+    {
+      "title": "Options",
+      "height": "50px",
+      "editable": true,
+      "collapse": false,
+      "collapsable": true,
+      "panels": [
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              2
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "TOTAL SRC ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              2
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "TOTAL SRC PORTS"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "ACCEPT SRC ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "ACCEPT SRC PORTS"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "REJECT SRC ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "REJECT SRC PORTS"
+        }
+      ],
+      "notice": false
+    },
+    {
+      "title": "Charts",
+      "height": "150px",
+      "editable": true,
+      "collapse": false,
+      "collapsable": true,
+      "panels": [
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              2
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "TOTAL SRC ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              2
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "TOTAL SRC PORTS"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "ACCEPT SRC ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "ACCEPT SRC PORTS"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "REJECT SRC ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.srcport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "REJECT SRC PORTS"
+        }
+      ],
+      "notice": false
+    },
+    {
+      "title": "Source",
+      "height": "150px",
+      "editable": true,
+      "collapse": false,
+      "collapsable": true,
+      "panels": [
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              2
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "TOTAL DEST ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              2
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "TOTAL DEST PORTS"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "ACCEPT DEST ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "ACCEPT DEST PORTS"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "REJECT DEST ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "table",
+          "counter_pos": "above",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "REJECT DEST PORTS"
+        }
+      ],
+      "notice": false
+    },
+    {
+      "title": "Destination",
+      "height": "150px",
+      "editable": true,
+      "collapse": false,
+      "collapsable": true,
+      "panels": [
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              2
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "TOTAL DEST ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              2
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "TOTAL DEST PORTS"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "ACCEPT DEST ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "ACCEPT DEST PORTS"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstaddr",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "REJECT DEST ADDR"
+        },
+        {
+          "error": false,
+          "span": 2,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "field": "$.dstport",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "total",
+          "style": {
+            "font-size": "8pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": false,
+          "arrangement": "horizontal",
+          "chart": "pie",
+          "counter_pos": "none",
+          "spyable": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "tmode": "terms_stats",
+          "tstat": "total",
+          "valuefield": "$.packets",
+          "title": "REJECT DEST PORTS"
+        }
+      ],
+      "notice": false
+    },
+    {
+      "title": "",
+      "height": "150px",
+      "editable": true,
+      "collapse": false,
+      "collapsable": true,
+      "panels": [
+        {
+          "error": false,
+          "span": 12,
+          "editable": false,
+          "type": "text",
+          "loadingEditor": false,
+          "mode": "text",
+          "content": "",
+          "style": {},
+          "title": "FLOW LOGS"
+        },
+        {
+          "error": false,
+          "span": 6,
+          "editable": true,
+          "type": "stats",
+          "loadingEditor": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0,
+              1,
+              2
+            ]
+          },
+          "style": {
+            "font-size": "16pt"
+          },
+          "format": "bytes",
+          "mode": "total",
+          "display_breakdown": "yes",
+          "sort_field": "",
+          "sort_reverse": false,
+          "label_name": "Action",
+          "value_name": "Value",
+          "spyable": true,
+          "show": {
+            "count": false,
+            "min": false,
+            "max": false,
+            "mean": false,
+            "std_deviation": false,
+            "sum_of_squares": false,
+            "total": true,
+            "variance": false
+          },
+          "field": "$.bytes",
+          "title": "Volume",
+          "unit": ""
+        },
+        {
+          "error": false,
+          "span": 6,
+          "editable": true,
+          "type": "stats",
+          "loadingEditor": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0,
+              1,
+              2
+            ]
+          },
+          "style": {
+            "font-size": "16pt"
+          },
+          "format": "number",
+          "mode": "total",
+          "display_breakdown": "yes",
+          "sort_field": "",
+          "sort_reverse": false,
+          "label_name": "Action",
+          "value_name": "Value",
+          "spyable": true,
+          "show": {
+            "count": false,
+            "min": false,
+            "max": false,
+            "mean": false,
+            "std_deviation": false,
+            "sum_of_squares": false,
+            "total": true,
+            "variance": false
+          },
+          "field": "$.packets",
+          "title": "Packets",
+          "unit": "packets"
+        }
+      ],
+      "notice": false
+    },
+    {
+      "title": "Events",
+      "height": "250px",
+      "editable": true,
+      "collapse": false,
+      "collapsable": true,
+      "panels": [
+        {
+          "error": false,
+          "span": 12,
+          "editable": true,
+          "group": [
+            "default"
+          ],
+          "type": "table",
+          "size": 10,
+          "pages": 10,
+          "offset": 0,
+          "sort": [
+            "@timestamp",
+            "desc"
+          ],
+          "style": {
+            "font-size": "8pt"
+          },
+          "overflow": "min-height",
+          "fields": [
+            "@timestamp",
+            "$.action",
+            "$.srcaddr",
+            "$.srcport",
+            "$.dstaddr",
+            "$.dstport",
+            "$.packets",
+            "$.bytes",
+            "$.protocol",
+            "$.interface_id",
+            "$.account_id"
+          ],
+          "highlight": [],
+          "sortable": true,
+          "header": true,
+          "paging": true,
+          "spyable": true,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              1
+            ]
+          },
+          "field_list": false,
+          "status": "Stable",
+          "trimFactor": 300,
+          "normTimes": true,
+          "title": "ACCEPT",
+          "all_fields": false,
+          "localTime": true,
+          "timeField": "@timestamp"
+        },
+        {
+          "error": false,
+          "span": 12,
+          "editable": true,
+          "group": [
+            "default"
+          ],
+          "type": "table",
+          "size": 10,
+          "pages": 10,
+          "offset": 0,
+          "sort": [
+            "@timestamp",
+            "desc"
+          ],
+          "style": {
+            "font-size": "8pt"
+          },
+          "overflow": "min-height",
+          "fields": [
+            "@timestamp",
+            "$.action",
+            "$.srcaddr",
+            "$.srcport",
+            "$.dstaddr",
+            "$.dstport",
+            "$.packets",
+            "$.bytes",
+            "$.protocol",
+            "$.interface_id",
+            "$.account_id"
+          ],
+          "highlight": [],
+          "sortable": true,
+          "header": true,
+          "paging": true,
+          "spyable": true,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              0
+            ]
+          },
+          "field_list": false,
+          "status": "Stable",
+          "trimFactor": 300,
+          "normTimes": true,
+          "title": "REJECT",
+          "all_fields": false,
+          "localTime": true,
+          "timeField": "@timestamp"
+        }
+      ],
+      "notice": false
+    }
+  ],
+  "editable": true,
+  "index": {
+    "interval": "day",
+    "pattern": "[cwl-]YYYY.MM.DD",
+    "default": "_all",
+    "warm_fields": true
+  },
+  "style": "light",
+  "failover": false,
+  "panel_hints": true,
+  "loader": {
+    "save_gist": false,
+    "save_elasticsearch": true,
+    "save_local": true,
+    "save_default": true,
+    "save_temp": true,
+    "save_temp_ttl_enable": true,
+    "save_temp_ttl": "30d",
+    "load_gist": true,
+    "load_elasticsearch": true,
+    "load_elasticsearch_size": 20,
+    "load_local": true,
+    "hide": false
+  },
+  "pulldowns": [
+    {
+      "type": "query",
+      "collapse": true,
+      "notice": false,
+      "query": "*",
+      "pinned": true,
+      "history": [
+        "$.action:REJECT"
+      ],
+      "remember": 10,
+      "enable": true
+    },
+    {
+      "type": "filtering",
+      "collapse": true,
+      "notice": true,
+      "enable": true
+    }
+  ],
+  "nav": [
+    {
+      "type": "timepicker",
+      "collapse": false,
+      "notice": false,
+      "status": "Stable",
+      "time_options": [
+        "15m",
+        "1h",
+        "3h",
+        "6h",
+        "8h",
+        "12h",
+        "24h",
+        "2d",
+        "7d",
+        "30d"
+      ],
+      "refresh_intervals": [
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "timefield": "@timestamp",
+      "enable": true,
+      "now": true,
+      "filter_id": 0
+    }
+  ],
+  "refresh": "5m"
+}

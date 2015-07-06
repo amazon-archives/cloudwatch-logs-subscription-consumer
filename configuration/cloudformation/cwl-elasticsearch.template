@@ -1,19 +1,19 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
 
-  "Description" : "A sample Elasticsearch/Kibana stack that hooks up with real-time data from CloudWatch Logs using a Subscription Filter. **NOTE** This template creates one or more Amazon EC2 instances, an Amazon Kinesis stream, and an Elastic Load Balancer. You will be billed for the AWS resources used if you create a stack from this template. You must have permissions to create IAM roles to use this template.",
+  "Description" : "A sample Elasticsearch/Kibana stack that hooks up with real-time data from CloudWatch Logs using a Subscription Filter. **NOTE** This template creates one or more Amazon EC2 instances, an Amazon Kinesis stream and an Elastic Load Balancer. You will be billed for the AWS resources used if you create a stack from this template. This template requires setting the \"Create IAM resources\" parameter to True.",
 
   "Parameters" : {
 
     "KeyName": {
-      "Description" : "The name of an existing key pair to enable SSH access to Amazon EC2 instances",
+      "Description" : "The name of an existing key pair to enable SSH access to the EC2 instances",
       "Type": "AWS::EC2::KeyPair::KeyName"
     },
 
     "InstanceType" : {
-      "Description" : "Elasticsearch Node Type (EC2 Instance)",
+      "Description" : "EC2 instance type for the Elasticsearch nodes",
       "Type" : "String",
-      "Default" : "m3.large",
+      "Default" : "m3.medium",
       "AllowedValues" : [ 
         "t2.micro", 
         "t2.small", 
@@ -49,7 +49,7 @@
         "cr1.8xlarge", 
         "cc2.8xlarge"
        ],
-      "ConstraintDescription" : "Must be a valid Amazon EC2 instance type"
+      "ConstraintDescription" : "Must be a valid EC2 instance type"
     },
 
     "AllowedIpSource" : {
@@ -63,7 +63,7 @@
     },
 
     "ClusterSize" : {
-      "Description" : "The number of EC2 instances hosting an Elasticsearch node",
+      "Description" : "The number of Elasticsearch nodes",
       "Type" : "Number",
       "Default" : "1"
     },
@@ -89,7 +89,8 @@
     "RetentionDays" : {
       "Description": "Number of days to retain logs in the Elasticsearch cluster",
       "Type": "Number",
-      "MinValue" : "0"
+      "Default" : "14",
+      "MinValue" : "1"
     },
     
     "MonitorStack" : {
@@ -100,14 +101,29 @@
     },
     
     "SubscriptionFilterPattern" : {
-      "Description": "Filter pattern to use for the new subscription filter",
+      "Description": "Optional filter pattern for the new subscription filter",
       "Type": "String"
     },
     
-    "NumberOfKinesisShards": {
+    "KinesisShards": {
       "Description": "Number of shards to create for the Kinesis subscription stream",
       "Type": "Number",
+      "Default" : "1",
       "MinValue" : "1"
+    },
+
+    "ElasticsearchShards": {
+      "Description": "The number of primary shards that an Elasticsearch index should have",
+      "Type": "Number",
+      "Default" : "5",
+      "MinValue" : "0"
+    },
+
+    "ElasticsearchReplicas": {
+      "Description": "The number of replica shards (copies) that each primary Elasticsearch shard should have",
+      "Type": "Number",
+      "Default" : "0",
+      "MinValue" : "0"
     }
   },
 
@@ -147,8 +163,8 @@
       "hs1.8xlarge" : { "Arch" : "HVM64"  },
       "cr1.8xlarge" : { "Arch" : "HVM64"  },
       "cc2.8xlarge" : { "Arch" : "HVM64"  }
-    }
-,
+    },
+
     "AWSRegionArch2AMI" : {
       "us-east-1"        : {"PV64" : "ami-1ccae774", "HVM64" : "ami-1ecae776", "HVMG2" : "ami-8c6b40e4"},
       "us-west-2"        : {"PV64" : "ami-ff527ecf", "HVM64" : "ami-e7527ed7", "HVMG2" : "ami-abbe919b"},
@@ -161,7 +177,6 @@
       "sa-east-1"        : {"PV64" : "ami-bb2890a6", "HVM64" : "ami-b52890a8", "HVMG2" : "NOT_SUPPORTED"},
       "cn-north-1"       : {"PV64" : "ami-fa39abc3", "HVM64" : "ami-f239abcb", "HVMG2" : "NOT_SUPPORTED"}
     }
-
   },
   
   "Conditions" : {
@@ -170,7 +185,7 @@
   },
 
   "Resources" : {
-      "KCLDDBTable": {
+      "KCLLeasesTable": {
          "Type": "AWS::DynamoDB::Table",
          "Properties": {
         "TableName": { "Ref": "AWS::StackName" },
@@ -185,18 +200,18 @@
           }
         ],
         "KeySchema" : [
-            {
+          {
             "AttributeName" : "leaseKey",
             "KeyType" : "HASH"
-            }
+          }
         ]
       }
-       },
+    },
     
     "KinesisSubscriptionStream": {
       "Type": "AWS::Kinesis::Stream",
       "Properties" :  {
-        "ShardCount": { "Ref": "NumberOfKinesisShards" }
+        "ShardCount": { "Ref": "KinesisShards" }
       }
     },
 
@@ -215,7 +230,7 @@
         }
       }  
     },
-    
+
     "CloudWatchLogsKinesisPolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
@@ -431,8 +446,8 @@
               }
             },
             "commands" : {
-              "00_moveNginx": {
-                "command": "mv ./nginx.conf /etc/nginx/nginx.conf"
+              "00_copyNginxConfig": {
+                "command": "cp ./cloudwatch-logs-subscription-consumer-1.0.0/configuration/nginx/nginx.conf /etc/nginx/nginx.conf"
               }, 
               "01_updateESConfigForNode": {
                 "command": { "Fn::Join" : ["", [
@@ -445,6 +460,12 @@
                   "node.rack: $(curl -silent http://169.254.169.254/latest/dynamic/instance-identity/document 2>/dev/null ",
                   "| grep availabilityZone ",
                   "| awk -F\\\" '{print $4}')",
+                  "\" >> /etc/elasticsearch/elasticsearch.yml &&",
+                  "echo \"",
+                  "index.number_of_shards: ", { "Ref": "ElasticsearchShards" }, 
+                  "\" >> /etc/elasticsearch/elasticsearch.yml &&",
+                  "echo \"",
+                  "index.number_of_replicas: ", { "Ref": "ElasticsearchReplicas" }, 
                   "\" >> /etc/elasticsearch/elasticsearch.yml"
                 ]]}
               },              
@@ -491,9 +512,9 @@
                 "command": { "Fn::Join" : ["", [
                   "{ nohup java -DkinesisInputStream=", { "Ref": "KinesisSubscriptionStream" },
                     " -DregionName=", { "Ref": "AWS::Region" },
-                    " -DappName=", { "Ref": "KCLDDBTable" }, 
+                    " -DappName=", { "Ref": "KCLLeasesTable" }, 
                     " -DelasticsearchClusterName=elasticsearch",
-                    " -jar cloudwatch-logs-subscription-consumer-1.0.0.jar",
+                    " -jar cloudwatch-logs-subscription-consumer-1.0.0/cloudwatch-logs-subscription-consumer-1.0.0.jar",
                     " > /dev/null 2>&1 & } && disown -h %1"
                   ]]},
                 "cwd": "~"
@@ -664,31 +685,31 @@
           "  exit 1\n",
           "}\n",
             
-          "cd ~ \n",
+          "cd ~\n",
                   
-          "# KCL \n",
-          "wget https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/cwl-elasticsearch-cf-stack-1.0.0.zip || error_exit \"Failed to get cf package\" \n",
-          "unzip cwl-elasticsearch-cf-stack-1.0.0.zip || error_exit \"Failed to unzip cf package\" \n",
-          "unzip cloudwatch-logs-subscription-consumer-1.0.0.zip || error_exit \"Failed to unzip KCL\" \n",
+          "# KCL and config files\n",
+          "wget https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/cloudwatch-logs-subscription-consumer-1.0.0-cfn.zip || error_exit \"Failed to get cf package\" \n",
+          "unzip cloudwatch-logs-subscription-consumer-1.0.0-cfn.zip || error_exit \"Failed to unzip cf package\" \n",
          
-       
           "# Config\n",
           "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r ElasticsearchServer ",
           "    --region ", { "Ref" : "AWS::Region" }, " -v || error_exit \"failed to run cfn-init\"\n",
 
-          
           "# Allow 60% of total mem as heap size for cluster \n",
           "freemem=$(free -m | grep Mem | awk '{ printf \"%1.0f\\n\", 0.6*$2; }')",
           " && sed -i \"s/#ES_HEAP_SIZE=.*/ES_HEAP_SIZE=$(echo $freemem)m/g\" /etc/sysconfig/elasticsearch",
           " || error_exit \"Failed to change heap size for es \" \n",
            
-          "# Get kibana\n",
-          "wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.2.zip || error_exit \"Failed to get kibana\" \n",
+          "# Get Kibana\n",
+          "wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.2.zip || error_exit \"Failed to get Kibana\" \n",
           "unzip kibana-3.1.2.zip || error_exit \"Kibana unzip failed\" \n",
           "mv kibana-3.1.2 /usr/share/nginx/html/ || error_exit \"Failed to move kibana config\" \n",
           "sed -i 's/elasticsearch:.*/elasticsearch: \"http:\\/\\/\" + window.location.hostname + \"\\/es\\/\",/g' /usr/share/nginx/html/kibana-3.1.2/config.js || error_exit \"Failed to change kibana config\"\n",
+
+          "# Add static Kibana dashboards\n",
+          "cp -f cloudwatch-logs-subscription-consumer-1.0.0/configuration/kibana/* /usr/share/nginx/html/kibana-3.1.2/app/dashboards/ || error_exit \"Failed to copy the Kibana static dashboards\" \n",
                     
-          "# Set cron for clean up \n",
+          "# Set hourly cron for clean up\n",
           "echo \"0 * * * * /usr/local/bin/curator --host localhost --port 9200 --debug delete indices --prefix \\\"cwl-\\\" --time-unit days --older-than ",
           { "Ref" : "RetentionDays" },
           " --timestring \\\"\\%Y.\\%m.\\%d\\\"\" >> mycron || error_exit \"Failed to create cron file\" \n",

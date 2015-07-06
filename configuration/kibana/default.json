@@ -1,0 +1,131 @@
+{
+  "title": "Build Your Dashboard!",
+  "services": {
+    "query": {
+      "list": {
+        "0": {
+          "query": "*",
+          "alias": "",
+          "color": "#7EB26D",
+          "id": 0,
+          "pin": false,
+          "type": "lucene",
+          "enable": true
+        }
+      },
+      "ids": [
+        0
+      ]
+    },
+    "filter": {
+      "list": {},
+      "ids": []
+    }
+  },
+  "rows": [
+    {
+      "title": "Intro",
+      "height": "500px",
+      "editable": false,
+      "collapse": false,
+      "collapsable": false,
+      "panels": [
+        {
+          "error": false,
+          "span": 12,
+          "editable": false,
+          "group": [
+            "default"
+          ],
+          "type": "text",
+          "mode": "markdown",
+          "content": "![kibana](img/kibana.png)  \n\n### Welcome to Kibana. \nYou must have landed here by starting up an Elasticsearch cluster from the CloudFormation template bundled with the [CloudWatch Logs Subscription Consumer](https://github.com/awslabs/cloudwatch-logs-subscription-consumer). \n\nLog events should start flowing in at the bottom of this page within a few seconds from their submission to CloudWatch Logs.\n\n### Setup\nAs soon as the first few log events show up at the bottom of this page you may want to start setting up your dashboard. We have prepared a few sample dashboards for some of the common sources of AWS log data:\n\n+ [Amazon VPC Flow Logs](index.html#/dashboard/file/VPCFlow-Sample-Dashboard.json) \n+ [AWS CloudTrail](index.html#/dashboard/file/CloudTrail-Sample-Dashboard.json) \n+ [AWS Lambda](index.html#/dashboard/file/Lambda-Sample-Dashboard.json)\n\nOtherwise you may want to start setting up your dashboard using one of the following options:\n\n+ [Sample Dashboard](index.html#/dashboard/file/Sample-Dashboard.json) \n+ [Blank Dashboard](index.html#/dashboard/file/Blank-Dashboard.json)",
+          "style": {},
+          "title": "Introduction",
+          "status": "Stable"
+        }
+      ],
+      "notice": false
+    },
+    {
+      "title": "Events",
+      "height": "150px",
+      "editable": false,
+      "collapse": false,
+      "collapsable": false,
+      "panels": [
+        {
+          "error": false,
+          "span": 12,
+          "editable": false,
+          "type": "table",
+          "loadingEditor": false,
+          "size": 100,
+          "pages": 5,
+          "offset": 0,
+          "sort": [
+            "@timestamp",
+            "desc"
+          ],
+          "overflow": "min-height",
+          "fields": [
+            "@timestamp",
+            "@owner",
+            "@log_group",
+            "@log_stream",
+            "@message"
+          ],
+          "highlight": [],
+          "sortable": true,
+          "header": true,
+          "paging": true,
+          "field_list": true,
+          "all_fields": false,
+          "trimFactor": 300,
+          "localTime": true,
+          "timeField": "@timestamp",
+          "spyable": true,
+          "queries": {
+            "mode": "all",
+            "ids": [
+              0
+            ]
+          },
+          "style": {
+            "font-size": "8pt"
+          },
+          "normTimes": true,
+          "title": "Log Events"
+        }
+      ],
+      "notice": false
+    }
+  ],
+  "editable": false,
+  "index": {
+    "interval": "day",
+    "pattern": "[cwl-]YYYY.MM.DD",
+    "default": "_all",
+    "warm_fields": true
+  },
+  "style": "dark",
+  "failover": true,
+  "panel_hints": true,
+  "pulldowns": [],
+  "nav": [],
+  "loader": {
+    "save_gist": false,
+    "save_elasticsearch": true,
+    "save_local": true,
+    "save_default": true,
+    "save_temp": true,
+    "save_temp_ttl_enable": true,
+    "save_temp_ttl": "30d",
+    "load_gist": true,
+    "load_elasticsearch": true,
+    "load_elasticsearch_size": 20,
+    "load_local": true,
+    "hide": false
+  },
+  "refresh": "5s"
+}
