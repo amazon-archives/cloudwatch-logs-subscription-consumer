@@ -99,9 +99,16 @@
       "Default" : "true",
       "AllowedValues" : ["true", "false"]
     },
-    
+
+    "LogFormat" : {
+      "Description": "Choose the format that best describes the type of logs in the selected log group",
+      "Type": "String",
+      "Default" : "Custom",
+      "AllowedValues" : ["Amazon VPC Flow Logs", "AWS Lambda", "AWS CloudTrail", "Custom"]
+    },
+
     "SubscriptionFilterPattern" : {
-      "Description": "Optional filter pattern for the new subscription filter",
+      "Description": "Optional filter pattern for custom log formats - Use this only if LogFormat is set to Custom",
       "Type": "String"
     },
     
@@ -487,10 +494,16 @@
               },
               "04_putSubscriptionFilter": {
                 "command": { "Fn::Join": ["", [
+                  "declare -A FILTERS=(",
+                  "[Amazon VPC Flow Logs]=\"[version, account_id, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytes, start, end, action, log_status]\" ",
+                  "[AWS Lambda]=\"[timestamp=*Z, request_id=\\\"*-*\\\", event]\" ",
+                  "[AWS CloudTrail]=\"\" ",
+                  "[Custom]=\"", { "Ref": "SubscriptionFilterPattern" }, "\" ",
+                  ") && ",
                   "aws logs put-subscription-filter ",
                       "--log-group-name \"", { "Ref": "LogGroupName" }, "\" ",
                       "--filter-name \"cwl-cfn-es-", { "Ref": "KinesisSubscriptionStream" }, "\" ",
-                      "--filter-pattern \"", { "Ref": "SubscriptionFilterPattern" },"\" ",
+                      "--filter-pattern \"${FILTERS[\"", { "Ref": "LogFormat" }, "\"]}\" ",
                       "--region \"", { "Ref" : "AWS::Region" }, "\" ",
                       "--destination-arn \"", 
                       "arn:aws:kinesis:", { "Ref": "AWS::Region" }, 
