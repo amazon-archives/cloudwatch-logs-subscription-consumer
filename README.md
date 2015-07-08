@@ -49,7 +49,7 @@ The CloudWatch Logs Subscription Consumer will automatically put log event messa
 Other log events that have a fixed-column format (such as traditional web server access logs) can get indexed easily in Elasticsearch by defining the field names in the CloudWatch Logs subscription filter pattern using the [Filter Pattern Syntax][pattern-syntax]. For example, if you had log data in this format:
 
 ```
-127.0.0.1 user-identifier frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326
+127.0.0.1 user-identifier frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif" 200 2326
 ```
 
 ... then you can use the following subscription filter pattern: 
