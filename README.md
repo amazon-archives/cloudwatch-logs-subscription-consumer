@@ -42,7 +42,7 @@ The following are snapshots of the sample Kibana dashboards that come built-in w
 
 ##### JSON Data
 
-The CloudWatch Logs Subscription Consumer will automatically put log event messages that are valid JSON as [Object fields][object-types] in Elasticsearch. Elasticsearch is able to understand these Object types and their inner hierarchies, providing query support for all the inner fields. You do not have to do specify anything beyond the source log group in the CloudFormation input parameters to have JSON data indexed in Elasticsearch.
+The CloudWatch Logs Subscription Consumer will automatically put log event messages that are valid JSON as [Object fields][object-types] in Elasticsearch. Elasticsearch is able to understand these Object types and their inner hierarchies, providing query support for all the inner fields. You do not have to specify anything beyond the source log group in the CloudFormation input parameters to have JSON data indexed in Elasticsearch.
 
 ##### Fixed-Column Data
 
