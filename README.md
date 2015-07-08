@@ -18,7 +18,7 @@ If you already have an active CloudWatch Logs log group, you can launch a **Clou
 
 [![Launch your Elasticsearch stack fed by CloudWatch Logs data](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)][launch-stack]
 
-You can view the CloudFormation template in: [configuration/cloudformation/cwl-elasticsearch.template][cfn-template]
+You can find the CloudFormation template in: [configuration/cloudformation/cwl-elasticsearch.template][cfn-template]
 
 **NOTE**: This template creates one or more Amazon EC2 instances, an Amazon Kinesis stream and an Elastic Load Balancer. You will be billed for the AWS resources used if you create a stack from this template.
 
@@ -191,6 +191,27 @@ The sample [Kibana dashboard for AWS CloudTrail][dashboard-cloudtrail] that come
 {$.userIdentity.type = Root && $.eventSource = autoscaling*}
 ```
 
+#### Elasticsearch Access Control
+
+The current version of the CloudFormation template allows you to configure two basic methods for controlling access to the Elasticsearch API and Kibana UI:
++ IP Address restrictions configured with [EC2 security groups][ec2-security-groups].
++ [HTTP Basic Auth][http-basic-auth] configured through an [nginx][nginx] proxy that sits in front of the Elasticsearch endpoint.
+
+This is generally considered an insufficient level of access control for clusters holding confidential data. It is highly recommended that you put additional security measures and access control mechanisms before you use this stack with production data. 
+
+The nginx setup can be easily modified to enable other security and access control features, such as:
++ Adding HTTPS support to authenticate the endpoint and protect the Basic Auth credentials.
++ Adding HTTPS Client Authentication to restrict access to authorized users only.
+
+You can find the nginx configuration used by the CloudFormation template in: [configuration/nginx/nginx.conf][nginx-conf]
+
+## Building from source
+
+Once you check out the code from GitHub, you can build it using Maven. To disable the GPG-signing in the build, use: 
+```
+mvn clean install -Dgpg.skip=true
+```
+
 ## Related Resources
 
 + [Amazon CloudWatch Logs][aws-cloudwatch-logs]
@@ -227,3 +248,7 @@ The sample [Kibana dashboard for AWS CloudTrail][dashboard-cloudtrail] that come
 [object-types]: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-object-type.html
 [pattern-syntax]: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/FilterAndPatternSyntax.html
 [cfn-template]: https://github.com/awslabs/cloudwatch-logs-subscription-consumer/blob/master/configuration/cloudformation/cwl-elasticsearch.template
+[ec2-security-groups]: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html
+[http-basic-auth]: https://en.wikipedia.org/wiki/Basic_access_authentication
+[nginx]: http://nginx.org/
+[nginx-conf]: https://github.com/awslabs/cloudwatch-logs-subscription-consumer/blob/master/configuration/nginx/nginx.conf
