@@ -727,7 +727,7 @@
           "# Get Kibana 3\n",
           "wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.2.zip || error_exit \"Failed to download Kibana 3\" \n",
           "unzip kibana-3.1.2.zip || error_exit \"Kibana 3 unzip failed\" \n",
-          "mkdir -p /usr/share/nginx/html/kibana3 || error_exit \"Failde to create Kibana 3 directory\" \n",
+          "mkdir -p /usr/share/nginx/html/kibana3 || error_exit \"Failed to create Kibana 3 directory\" \n",
           "mv kibana-3.1.2/* /usr/share/nginx/html/kibana3 || error_exit \"Failed to move Kibana 3 assets\" \n",
           "sed -i 's/elasticsearch:.*/elasticsearch: \"http:\\/\\/\" + window.location.hostname,/g' /usr/share/nginx/html/kibana3/config.js || error_exit \"Failed to update Kibana 3 config\"\n",
 
