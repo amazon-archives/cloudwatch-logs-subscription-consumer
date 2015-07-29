@@ -40,15 +40,23 @@ The following are snapshots of the sample Kibana 3 dashboards that come built-in
 
 #### Setting up Kibana 4 for CloudWatch Logs
 
-The CloudFormation template sets up Kibana 3 with the correct Elasticsearch index patterns for this application, but Kibana 4 needs to be configured manually. When you visit the Kibana 4 URL for the first time you will be prompted to configure an index pattern. You should: 
+The CloudFormation template sets up Kibana 3 with the correct Elasticsearch index patterns for this application, but Kibana 4 needs to be configured manually. When you visit the Kibana 4 URL for the first time you will be prompted to configure an index pattern where you have to: 
 
 + Turn on "Index contains time-based events"
 + Turn on "Use event times to create index names"
-+ Pick "Daily" for the "index pattern interval" field
-+ Enter `[cwl-]YYYY.MM.DD` for the "index name or pattern" field
++ Pick "Daily" for the "Index pattern interval" field
++ Enter `[cwl-]YYYY.MM.DD` for the "Index name or pattern" field
 + Choose `@timestamp` for the "Time-field name"
 
-Then you can go ahead and create the index pattern and start using Kibana 4 with data from CloudWatch Logs.
+Then you can go ahead and create the index pattern and start using Kibana 4 with data from CloudWatch Logs. Once the index pattern is configured, you can use the Discover, Visualize and Dashboards sections to interact with your CloudWatch Logs data.
+
+##### Kibana 4 Discover section with VPC Flow Logs
+
+[![Kibana 4 Discover](https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Small-Kibana4-Discover.png)][dashboard-kibana4-discover]
+
+##### Kibana 4 Dashboard section with VPC Flow Logs
+
+[![Kibana 4 Dashboard](https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Small-Kibana4-Dashboard.png)][dashboard-kibana4]
 
 #### Elasticsearch Administration
 
@@ -277,6 +285,8 @@ mvn exec:java -P Stdout -DkinesisInputStream=application-log-stream -DregionName
 [dashboard-vpc]: https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Full-VPCFlowLogs-Dashboard.png
 [dashboard-lambda]: https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Full-Lambda-Dashboard.png
 [dashboard-cloudtrail]: https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Full-CloudTrail-Dashboard.png
+[dashboard-kibana4-discover]: https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Full-Kibana4-Discover.png
+[dashboard-kibana4]: https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Full-Kibana4-Dashboard.png
 [sending-vpc-flow-logs]: https://aws.amazon.com/blogs/aws/vpc-flow-logs-log-and-view-network-traffic-flows/
 [sending-cloudtrail-logs]: http://docs.aws.amazon.com/awscloudtrail/latest/userguide/send-cloudtrail-events-to-cloudwatch-logs.html
 [object-types]: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-object-type.html
