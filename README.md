@@ -50,6 +50,12 @@ The CloudFormation template sets up Kibana 3 with the correct Elasticsearch inde
 
 Then you can go ahead and create the index pattern and start using Kibana 4 with data from CloudWatch Logs.
 
+#### Elasticsearch Administration
+
+The CloudFormation template also installs the [kopf plugin][kopf] which allows you to monitor and manage your Elasticsearch cluster from a web interface.
+
+![Kopf Web Interface](https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Small-Kopf-UI.png)]
+
 #### Getting CloudWatch Logs data indexed in Elasticsearch
 
 ##### JSON Data
@@ -281,3 +287,4 @@ mvn exec:java -P Stdout -DkinesisInputStream=application-log-stream -DregionName
 [http-basic-auth]: https://en.wikipedia.org/wiki/Basic_access_authentication
 [nginx]: http://nginx.org/
 [nginx-conf]: https://github.com/awslabs/cloudwatch-logs-subscription-consumer/blob/master/configuration/nginx/nginx.conf
+[kopf]: https://github.com/lmenezes/elasticsearch-kopf
