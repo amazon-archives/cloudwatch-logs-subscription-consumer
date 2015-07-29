@@ -22,6 +22,10 @@ You can find the CloudFormation template in: [configuration/cloudformation/cwl-e
 
 **NOTE**: This template creates one or more Amazon EC2 instances, an Amazon Kinesis stream and an Elastic Load Balancer. You will be billed for the AWS resources used if you create a stack from this template.
 
+Your CloudFormation stack may take about 10 minutes to create. Once its status transitions to `CREATE_COMPLETE` you can navigate to the *Outputs* tab to get the important URLs for your stack.
+
+[![CloudFormation Output](https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Small-CFN-Output.png)][cfn-output]
+
 #### Sample Kibana 3 Dashboards (Click to Expand)
 
 The following are snapshots of the sample Kibana 3 dashboards that come built-in with the provided CloudFormation stack. Click on any of the screenshots below to expand to a full view.
@@ -298,3 +302,4 @@ mvn exec:java -P Stdout -DkinesisInputStream=application-log-stream -DregionName
 [nginx]: http://nginx.org/
 [nginx-conf]: https://github.com/awslabs/cloudwatch-logs-subscription-consumer/blob/master/configuration/nginx/nginx.conf
 [kopf]: https://github.com/lmenezes/elasticsearch-kopf
+[cfn-output]: https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Full-CFN-Output.png
