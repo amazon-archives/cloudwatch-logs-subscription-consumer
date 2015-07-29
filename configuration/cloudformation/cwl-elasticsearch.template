@@ -73,13 +73,13 @@
       "Type": "String",
       "Default": ""
     },
-    
+
     "NginxUsername" : {
       "Description": "Username to access the Kibana interface and the Elasticsearch API",
       "Type": "String",
       "MinLength" : "1"
     },
-    
+
     "NginxPassword" : {
       "Description": "Password to access the Kibana interface and the Elasticsearch API",
       "Type": "String",
@@ -92,7 +92,7 @@
       "Default" : "14",
       "MinValue" : "1"
     },
-    
+
     "MonitorStack" : {
       "Description": "Push logs from Elasticsearch, Nginx, KCL and CloudFormation to CloudWatch Logs",
       "Type": "String",
@@ -214,7 +214,7 @@
         ]
       }
     },
-    
+
     "KinesisSubscriptionStream": {
       "Type": "AWS::Kinesis::Stream",
       "Properties" :  {
@@ -328,7 +328,7 @@
         "Roles": [ { "Ref": "ElasticsearchNodeRole" } ]
       }
     },
-    
+
     "ElasticsearchSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
@@ -454,9 +454,12 @@
             },
             "commands" : {
               "00_copyNginxConfig": {
-                "command": "cp ./cloudwatch-logs-subscription-consumer-1.0.0/configuration/nginx/nginx.conf /etc/nginx/nginx.conf"
+                "command": "cp ./cloudwatch-logs-subscription-consumer-1.1.0/configuration/nginx/nginx.conf /etc/nginx/nginx.conf"
+              },
+              "01_copyElasticsearchTemplates": {
+                "command": "cp -R ./cloudwatch-logs-subscription-consumer-1.1.0/configuration/elasticsearch/* /etc/elasticsearch/"
               }, 
-              "01_updateESConfigForNode": {
+              "02_updateESConfigForNode": {
                 "command": { "Fn::Join" : ["", [
                   "echo \"",
                   "node.name: $(curl -silent http://169.254.169.254/latest/dynamic/instance-identity/document 2>/dev/null ",
@@ -467,19 +470,17 @@
                   "node.rack: $(curl -silent http://169.254.169.254/latest/dynamic/instance-identity/document 2>/dev/null ",
                   "| grep availabilityZone ",
                   "| awk -F\\\" '{print $4}')",
-                  "\" >> /etc/elasticsearch/elasticsearch.yml &&",
-                  "echo \"",
-                  "index.number_of_shards: ", { "Ref": "ElasticsearchShards" }, 
-                  "\" >> /etc/elasticsearch/elasticsearch.yml &&",
-                  "echo \"",
-                  "index.number_of_replicas: ", { "Ref": "ElasticsearchReplicas" }, 
                   "\" >> /etc/elasticsearch/elasticsearch.yml"
                 ]]}
-              },              
-              "02_installESPlugin": {
-                "command": "/usr/share/elasticsearch/bin/plugin -install elasticsearch/elasticsearch-cloud-aws/2.6.0"
-              },               
-              "03_deleteSubscriptionFilter": {
+              },
+              "03_installESPlugins": {
+                "command": { "Fn::Join" : ["", [
+                  "/usr/share/elasticsearch/bin/plugin -install elasticsearch/elasticsearch-cloud-aws/2.6.0",
+                  "&&",
+                  "/usr/share/elasticsearch/bin/plugin -install lmenezes/elasticsearch-kopf/1.5.5"
+                ]]}
+              },
+              "04_deleteSubscriptionFilter": {
                 "command": { "Fn::Join" : ["", [
                   "aws logs delete-subscription-filter ",
                       "--log-group-name \"", { "Ref": "LogGroupName" }, "\" ",
@@ -492,7 +493,7 @@
                 ]]},
                 "ignoreErrors": true
               },
-              "04_putSubscriptionFilter": {
+              "05_putSubscriptionFilter": {
                 "command": { "Fn::Join": ["", [
                   "declare -A FILTERS=(",
                   "[Amazon VPC Flow Logs]=\"[version, account_id, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytes, start, end, action, log_status]\" ",
@@ -514,34 +515,39 @@
                       ":role/", { "Ref": "CloudWatchLogsKinesisRole" },"\""
                  ]]}
               }, 
-              "05_nginxAuthConfig": {
+              "06_nginxAuthConfig": {
                 "command": { "Fn::Join" : ["", [ 
                   "htpasswd -c -b /etc/nginx/.htpasswd ", 
                   { "Ref": "NginxUsername" }, " ", 
                   { "Ref": "NginxPassword" }, "\n"
-                 ]]}                 
+                 ]]}
               },
-              "06_startKCL": {
+              "07_startKCL": {
                 "command": { "Fn::Join" : ["", [
                   "{ nohup java -DkinesisInputStream=", { "Ref": "KinesisSubscriptionStream" },
                     " -DregionName=", { "Ref": "AWS::Region" },
                     " -DappName=", { "Ref": "KCLLeasesTable" },
                     " -Dlog4j.configuration=log4j-prod.properties",
                     " -DelasticsearchClusterName=elasticsearch",
-                    " -jar cloudwatch-logs-subscription-consumer-1.0.0/cloudwatch-logs-subscription-consumer-1.0.0.jar",
+                    " -cp cloudwatch-logs-subscription-consumer-1.1.0/cloudwatch-logs-subscription-consumer-1.1.0.jar",
+                    " com.amazonaws.services.logs.connectors.samples.elasticsearch.ElasticsearchConnector",
                     " > /dev/null 2>&1 & } && disown -h %1"
                   ]]},
                 "cwd": "~"
               },
-              "07_getPipAndCurator": {
+              "08_startKibana4": {
+                "command": "{ nohup ./kibana-4.1.1-linux-x64/bin/kibana > /dev/null 2>&1 & } && disown -h %1",
+                "cwd": "~"
+              },
+              "09_getPipAndCurator": {
                 "command": "python get-pip.py && /usr/local/bin/pip install elasticsearch-curator",
                 "cwd": "/pipstuff"
               },
-              "08_CWLStateDir" : {
+              "10_CWLStateDir" : {
                 "command" : "mkdir -p /var/awslogs/state"
               }
             },
-            
+
             "files": {
               "/etc/elasticsearch/elasticsearch.yml" : {
                 "content" : { "Fn::Join" : ["", [
@@ -573,7 +579,7 @@
               "/etc/logrotate.d/nginx": {
                    "content": { "Fn::Join" : ["", [
                   "/var/log/nginx/access.log\n",
-                  "/var/log/nginx/error.log\n",                  
+                  "/var/log/nginx/error.log\n",
                   "{\n",
                   "    daily\n",
                   "    rotate 5\n",
@@ -585,7 +591,7 @@
               },
               "/etc/logrotate.d/cloudwatch-logs-subscription-consumer": {
                    "content": { "Fn::Join" : ["", [
-                  "/var/log/cloudwatch-logs-subscription-consumer.log\n",                  
+                  "/var/log/cloudwatch-logs-subscription-consumer.log\n",
                   "{\n",
                   "    daily\n",
                   "    rotate 5\n",
@@ -618,22 +624,22 @@
                       "file = /var/log/cfn-init.log\n",
                       "log_group_name = ", { "Ref": "CloudFormationLogs" }, "\n",
                       "log_stream_name = {instance_id}\n",
-                   
+
                       "[/var/log/elasticsearch/elasticsearch.log]\n",
                       "file = /var/log/elasticsearch/elasticsearch.log\n",
                       "log_group_name = ", { "Ref": "ElasticsearchLogs" }, "\n",
                       "log_stream_name = {instance_id}\n",
-                      
+
                       "[/var/log/nginx/access.log]\n",
                       "file = /var/log/nginx/access.log\n",
                       "log_group_name = ", { "Ref": "NginxAccessLogs" }, "\n",
                       "log_stream_name = {instance_id}\n",
-                      
+
                       "[/var/log/nginx/error.log]\n",
                       "file = /var/log/nginx/error.log\n",
                       "log_group_name = ", { "Ref": "NginxErrorLogs" }, "\n",
                       "log_stream_name = {instance_id}\n",
-                      
+
                       "[/var/log/cloudwatch-logs-subscription-consumer.log]\n",
                       "file = /var/log/cloudwatch-logs-subscription-consumer.log\n",
                       "log_group_name = ", { "Ref": "KCLLogs" }, "\n",
@@ -649,7 +655,7 @@
                 ]
               } 
             },
-            
+
             "services": {
               "sysvinit": {
                 "nginx": {
@@ -691,20 +697,24 @@
           "#!/bin/bash\n",
           "yum update -y aws-cfn-bootstrap\n",
           "yum update -y aws-cli\n",
-          
+
           "# Helper function\n",
           "function error_exit\n",
           "{\n",
           "  /opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "WaitHandle" }, "'\n",
           "  exit 1\n",
           "}\n",
-            
+
           "cd ~\n",
-                  
+
           "# KCL and config files\n",
-          "wget https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/cloudwatch-logs-subscription-consumer-1.0.0-cfn.zip || error_exit \"Failed to get cf package\" \n",
-          "unzip cloudwatch-logs-subscription-consumer-1.0.0-cfn.zip || error_exit \"Failed to unzip cf package\" \n",
-         
+          "wget https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/cloudwatch-logs-subscription-consumer-1.1.0-cfn.zip || error_exit \"Failed to get cf package\" \n",
+          "unzip cloudwatch-logs-subscription-consumer-1.1.0-cfn.zip || error_exit \"Failed to unzip cf package\" \n",
+
+          "# Get Kibana 4\n",
+          "wget https://download.elastic.co/kibana/kibana/kibana-4.1.1-linux-x64.tar.gz || error_exit \"Failed to download Kibana 4\" \n",
+          "tar -xf kibana-4.1.1-linux-x64.tar.gz || error_exit \"Kibana 4 untar failed\" \n",
+
           "# Config\n",
           "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r ElasticsearchServer ",
           "    --region ", { "Ref" : "AWS::Region" }, " -v || error_exit \"failed to run cfn-init\"\n",
@@ -713,17 +723,24 @@
           "freemem=$(free -m | grep Mem | awk '{ printf \"%1.0f\\n\", 0.6*$2; }')",
           " && sed -i \"s/#ES_HEAP_SIZE=.*/ES_HEAP_SIZE=$(echo $freemem)m/g\" /etc/sysconfig/elasticsearch",
           " || error_exit \"Failed to change heap size for es \" \n",
-           
-          "# Get Kibana\n",
-          "wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.2.zip || error_exit \"Failed to get Kibana\" \n",
-          "unzip kibana-3.1.2.zip || error_exit \"Kibana unzip failed\" \n",
-          "mv kibana-3.1.2 /usr/share/nginx/html/ || error_exit \"Failed to move kibana config\" \n",
-          "sed -i 's/elasticsearch:.*/elasticsearch: \"http:\\/\\/\" + window.location.hostname + \"\\/es\\/\",/g' /usr/share/nginx/html/kibana-3.1.2/config.js || error_exit \"Failed to change kibana config\"\n",
 
-          "# Add static Kibana dashboards\n",
-          "cp -f cloudwatch-logs-subscription-consumer-1.0.0/configuration/kibana/* /usr/share/nginx/html/kibana-3.1.2/app/dashboards/ || error_exit \"Failed to copy the Kibana static dashboards\" \n",
-                    
-          "# Set hourly cron for clean up\n",
+          "# Get Kibana 3\n",
+          "wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.2.zip || error_exit \"Failed to download Kibana 3\" \n",
+          "unzip kibana-3.1.2.zip || error_exit \"Kibana 3 unzip failed\" \n",
+          "mkdir -p /usr/share/nginx/html/kibana3 || error_exit \"Failde to create Kibana 3 directory\" \n",
+          "mv kibana-3.1.2/* /usr/share/nginx/html/kibana3 || error_exit \"Failed to move Kibana 3 assets\" \n",
+          "sed -i 's/elasticsearch:.*/elasticsearch: \"http:\\/\\/\" + window.location.hostname,/g' /usr/share/nginx/html/kibana3/config.js || error_exit \"Failed to update Kibana 3 config\"\n",
+
+          "# Add static Kibana 3 dashboards\n",
+          "cp -f cloudwatch-logs-subscription-consumer-1.1.0/configuration/kibana/* /usr/share/nginx/html/kibana3/app/dashboards/ || error_exit \"Failed to copy the Kibana 3 static dashboards\" \n",
+
+          "# Update Elasticsearch index templates\n",
+          "sed -i '5i\\ \\ \\ \\ \\ \\ \"index.number_of_replicas\" : ", { "Ref": "ElasticsearchReplicas" } ,",' /etc/elasticsearch/templates/cwl_template.json || error_exit \"Failed update cwl_template.json\"\n",
+          "sed -i '5i\\ \\ \\ \\ \\ \\ \"number_of_shards\" : ", { "Ref": "ElasticsearchShards" } ,",' /etc/elasticsearch/templates/cwl_template.json || error_exit \"Failed update cwl_template.json\"\n",
+          "sed -i '5i\\ \\ \\ \\ \\ \\ \"index.number_of_replicas\" : ", { "Ref": "ElasticsearchReplicas" } ,",' /etc/elasticsearch/templates/kibana3_template.json || error_exit \"Failed update kibana3_template.json\"\n",
+          "sed -i '5i\\ \\ \\ \\ \\ \\ \"index.number_of_replicas\" : ", { "Ref": "ElasticsearchReplicas" } ,",' /etc/elasticsearch/templates/kibana4_template.json || error_exit \"Failed update kibana4_template.json\"\n",
+
+          "# Set hourly cron for curator\n",
           "echo \"0 * * * * /usr/local/bin/curator --host localhost --port 9200 --debug delete indices --prefix \\\"cwl-\\\" --time-unit days --older-than ",
           { "Ref" : "RetentionDays" },
           " --timestring \\\"\\%Y.\\%m.\\%d\\\"\" >> mycron || error_exit \"Failed to create cron file\" \n",
@@ -750,9 +767,21 @@
     }
   },
   "Outputs" : {
-    "URL" : {
-      "Description" : "Kibana URL",
-      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticsearchELB", "DNSName" ]}]]}
+    "Kibana3" : {
+      "Description" : "Kibana 3 (Includes Sample Dashboards)",
+      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticsearchELB", "DNSName" ]}, "/kibana3/#"]]}
+    },
+    "Kibana4" : {
+      "Description" : "Kibana 4",
+      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticsearchELB", "DNSName" ]}, "/kibana4/#"]]}
+    },
+    "Elasticsearch" : {
+      "Description" : "Elasticsearch API",
+      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticsearchELB", "DNSName" ]}, "/?pretty"]]}
+    },
+    "Kopf" : {
+      "Description" : "Kopf Admin Tool",
+      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticsearchELB", "DNSName" ]}, "/_plugin/kopf"]]}
     }
   }
 }

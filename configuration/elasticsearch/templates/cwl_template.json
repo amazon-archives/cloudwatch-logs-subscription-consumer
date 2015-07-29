@@ -1,0 +1,26 @@
+{
+  "template": "cwl-*",
+  "order": 1,
+  "settings" : {
+      "index.query.default_field" : "@message"
+  },
+  "mappings": {
+      "_default_": {
+          "_all": {
+              "enabled": false
+          },
+          "properties": {
+              "@message": {
+                  "type": "string"
+              },
+              "@id": {
+                  "type": "string"
+              },
+              "@timestamp": {
+                  "type": "date",
+                  "doc_values": true
+              }
+          }
+      }
+  }
+}

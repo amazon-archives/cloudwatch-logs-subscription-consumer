@@ -148,7 +148,7 @@
           "fields": [
             "@timestamp",
             "@log_group",
-            "$.request_id"
+            "request_id"
           ],
           "highlight": [],
           "sortable": true,
@@ -203,11 +203,7 @@
       "notice": false,
       "query": "*",
       "pinned": true,
-      "history": [
-        "",
-        "$.action:*",
-        "$.action:REJECT"
-      ],
+      "history": [],
       "remember": 10,
       "enable": true
     },

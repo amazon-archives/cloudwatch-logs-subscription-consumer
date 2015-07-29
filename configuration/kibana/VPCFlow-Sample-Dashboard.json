@@ -4,7 +4,7 @@
     "query": {
       "list": {
         "0": {
-          "query": "$.action:REJECT",
+          "query": "action:REJECT",
           "alias": "REJECT",
           "color": "#E24D42",
           "id": 0,
@@ -19,7 +19,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.action:ACCEPT"
+          "query": "action:ACCEPT"
         },
         "2": {
           "id": 2,
@@ -28,7 +28,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.action:*"
+          "query": "action:*"
         }
       },
       "ids": [
@@ -113,7 +113,7 @@
           "loadingEditor": false,
           "mode": "total",
           "time_field": "@timestamp",
-          "value_field": "$.bytes",
+          "value_field": "bytes",
           "x-axis": true,
           "y-axis": true,
           "scale": 1,
@@ -186,7 +186,7 @@
           "loadingEditor": false,
           "mode": "total",
           "time_field": "@timestamp",
-          "value_field": "$.bytes",
+          "value_field": "bytes",
           "x-axis": true,
           "y-axis": true,
           "scale": 1,
@@ -259,7 +259,7 @@
           "loadingEditor": false,
           "mode": "total",
           "time_field": "@timestamp",
-          "value_field": "$.bytes",
+          "value_field": "bytes",
           "x-axis": true,
           "y-axis": true,
           "scale": 1,
@@ -332,7 +332,7 @@
           "loadingEditor": false,
           "mode": "total",
           "time_field": "@timestamp",
-          "value_field": "$.packets",
+          "value_field": "packets",
           "x-axis": true,
           "y-axis": true,
           "scale": 1,
@@ -405,7 +405,7 @@
           "loadingEditor": false,
           "mode": "total",
           "time_field": "@timestamp",
-          "value_field": "$.packets",
+          "value_field": "packets",
           "x-axis": true,
           "y-axis": true,
           "scale": 1,
@@ -478,7 +478,7 @@
           "loadingEditor": false,
           "mode": "total",
           "time_field": "@timestamp",
-          "value_field": "$.packets",
+          "value_field": "packets",
           "x-axis": true,
           "y-axis": true,
           "scale": 1,
@@ -560,7 +560,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcaddr",
+          "field": "srcaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -584,7 +584,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "TOTAL SRC ADDR"
         },
         {
@@ -593,7 +593,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcport",
+          "field": "srcport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -617,7 +617,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "TOTAL SRC PORTS"
         },
         {
@@ -626,7 +626,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcaddr",
+          "field": "srcaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -650,7 +650,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "ACCEPT SRC ADDR"
         },
         {
@@ -659,7 +659,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcport",
+          "field": "srcport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -683,7 +683,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "ACCEPT SRC PORTS"
         },
         {
@@ -692,7 +692,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcaddr",
+          "field": "srcaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -716,7 +716,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "REJECT SRC ADDR"
         },
         {
@@ -725,7 +725,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcport",
+          "field": "srcport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -749,7 +749,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "REJECT SRC PORTS"
         }
       ],
@@ -768,7 +768,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcaddr",
+          "field": "srcaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -792,7 +792,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "TOTAL SRC ADDR"
         },
         {
@@ -801,7 +801,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcport",
+          "field": "srcport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -825,7 +825,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "TOTAL SRC PORTS"
         },
         {
@@ -834,7 +834,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcaddr",
+          "field": "srcaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -858,7 +858,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "ACCEPT SRC ADDR"
         },
         {
@@ -867,7 +867,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcport",
+          "field": "srcport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -891,7 +891,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "ACCEPT SRC PORTS"
         },
         {
@@ -900,7 +900,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcaddr",
+          "field": "srcaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -924,7 +924,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "REJECT SRC ADDR"
         },
         {
@@ -933,7 +933,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.srcport",
+          "field": "srcport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -957,7 +957,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "REJECT SRC PORTS"
         }
       ],
@@ -976,7 +976,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstaddr",
+          "field": "dstaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1000,7 +1000,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "TOTAL DEST ADDR"
         },
         {
@@ -1009,7 +1009,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstport",
+          "field": "dstport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1033,7 +1033,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "TOTAL DEST PORTS"
         },
         {
@@ -1042,7 +1042,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstaddr",
+          "field": "dstaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1066,7 +1066,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "ACCEPT DEST ADDR"
         },
         {
@@ -1075,7 +1075,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstport",
+          "field": "dstport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1099,7 +1099,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "ACCEPT DEST PORTS"
         },
         {
@@ -1108,7 +1108,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstaddr",
+          "field": "dstaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1132,7 +1132,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "REJECT DEST ADDR"
         },
         {
@@ -1141,7 +1141,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstport",
+          "field": "dstport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1165,7 +1165,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "REJECT DEST PORTS"
         }
       ],
@@ -1184,7 +1184,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstaddr",
+          "field": "dstaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1208,7 +1208,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "TOTAL DEST ADDR"
         },
         {
@@ -1217,7 +1217,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstport",
+          "field": "dstport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1241,7 +1241,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "TOTAL DEST PORTS"
         },
         {
@@ -1250,7 +1250,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstaddr",
+          "field": "dstaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1274,7 +1274,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "ACCEPT DEST ADDR"
         },
         {
@@ -1283,7 +1283,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstport",
+          "field": "dstport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1307,7 +1307,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "ACCEPT DEST PORTS"
         },
         {
@@ -1316,7 +1316,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstaddr",
+          "field": "dstaddr",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1340,7 +1340,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "REJECT DEST ADDR"
         },
         {
@@ -1349,7 +1349,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.dstport",
+          "field": "dstport",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1373,7 +1373,7 @@
           },
           "tmode": "terms_stats",
           "tstat": "total",
-          "valuefield": "$.packets",
+          "valuefield": "packets",
           "title": "REJECT DEST PORTS"
         }
       ],
@@ -1432,7 +1432,7 @@
             "total": true,
             "variance": false
           },
-          "field": "$.bytes",
+          "field": "bytes",
           "title": "Volume",
           "unit": ""
         },
@@ -1471,7 +1471,7 @@
             "total": true,
             "variance": false
           },
-          "field": "$.packets",
+          "field": "packets",
           "title": "Packets",
           "unit": "packets"
         }
@@ -1506,16 +1506,16 @@
           "overflow": "min-height",
           "fields": [
             "@timestamp",
-            "$.action",
-            "$.srcaddr",
-            "$.srcport",
-            "$.dstaddr",
-            "$.dstport",
-            "$.packets",
-            "$.bytes",
-            "$.protocol",
-            "$.interface_id",
-            "$.account_id"
+            "action",
+            "srcaddr",
+            "srcport",
+            "dstaddr",
+            "dstport",
+            "packets",
+            "bytes",
+            "protocol",
+            "interface_id",
+            "account_id"
           ],
           "highlight": [],
           "sortable": true,
@@ -1558,16 +1558,16 @@
           "overflow": "min-height",
           "fields": [
             "@timestamp",
-            "$.action",
-            "$.srcaddr",
-            "$.srcport",
-            "$.dstaddr",
-            "$.dstport",
-            "$.packets",
-            "$.bytes",
-            "$.protocol",
-            "$.interface_id",
-            "$.account_id"
+            "action",
+            "srcaddr",
+            "srcport",
+            "dstaddr",
+            "dstport",
+            "packets",
+            "bytes",
+            "protocol",
+            "interface_id",
+            "account_id"
           ],
           "highlight": [],
           "sortable": true,
@@ -1624,9 +1624,7 @@
       "notice": false,
       "query": "*",
       "pinned": true,
-      "history": [
-        "$.action:REJECT"
-      ],
+      "history": [],
       "remember": 10,
       "enable": true
     },

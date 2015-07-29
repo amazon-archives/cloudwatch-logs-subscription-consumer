@@ -6,13 +6,13 @@ The current version of the CloudWatch Logs Subscription Consumer comes with buil
 
 ## One-Click Setup: CloudWatch Logs + Elasticsearch + Kibana
 
-This project includes a sample [CloudFormation][aws-cloudformation] template that can quickly bring up an Elasticsearch cluster on [Amazon EC2][amazon-ec2] fed with real-time data from any CloudWatch Logs log group. The CloudFormation template will also install a few sample [Kibana][kibana] dashboards for the following sources of AWS log data: 
+This project includes a sample [CloudFormation][aws-cloudformation] template that can quickly bring up an Elasticsearch cluster on [Amazon EC2][amazon-ec2] fed with real-time data from any CloudWatch Logs log group. The CloudFormation template will also install [Kibana 3][kibana3] and [Kibana 4.1][kibana4], and it comes bundled with a few sample Kibana 3 dashboards for the following sources of AWS log data: 
 
 + [Amazon VPC Flow Logs][sending-vpc-flow-logs]
 + [AWS Lambda][aws-lambda]
 + [AWS CloudTrail][sending-cloudtrail-logs]
  
-You can also connect your Elasticsearch cluster to any other custom CloudWatch Logs log group and then customize the Kibana dashboard based on your own log formats.
+You can also connect your Elasticsearch cluster to any other custom CloudWatch Logs log group and then use Kibana to interactively analyze your log data with ad-hoc visualizations and custom dashboards.
 
 If you already have an active CloudWatch Logs log group, you can launch a **CloudWatch Logs + Elasticsearch + Kibana** stack right now with this launch button: 
 
@@ -22,9 +22,9 @@ You can find the CloudFormation template in: [configuration/cloudformation/cwl-e
 
 **NOTE**: This template creates one or more Amazon EC2 instances, an Amazon Kinesis stream and an Elastic Load Balancer. You will be billed for the AWS resources used if you create a stack from this template.
 
-#### Sample Kibana Dashboards (Click to Expand)
+#### Sample Kibana 3 Dashboards (Click to Expand)
 
-The following are snapshots of the sample Kibana dashboards that come built-in with the provided CloudFormation stack. Click on any of the screenshots below to expand to a full view.
+The following are snapshots of the sample Kibana 3 dashboards that come built-in with the provided CloudFormation stack. Click on any of the screenshots below to expand to a full view.
 
 ##### Amazon VPC Flow Logs
 
@@ -37,6 +37,18 @@ The following are snapshots of the sample Kibana dashboards that come built-in w
 ##### AWS CloudTrail
 
 [![CloudTrail Sample Dashboard](https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Small-CloudTrail-Dashboard.png)][dashboard-cloudtrail]
+
+#### Setting up Kibana 4 for CloudWatch Logs
+
+The CloudFormation template sets up Kibana 3 with the correct Elasticsearch index patterns for this application, but Kibana 4 needs to be configured manually. When you visit the Kibana 4 URL for the first time you will be prompted to configure an index pattern. You should: 
+
++ Turn on "Index contains time-based events"
++ Turn on "Use event times to create index names"
++ Pick "Daily" for the "index pattern interval" field
++ Enter `[cwl-]YYYY.MM.DD` for the "index name or pattern" field
++ Choose `@timestamp` for the "Time-field name"
+
+Then you can go ahead and create the index pattern and start using Kibana 4 with data from CloudWatch Logs.
 
 #### Getting CloudWatch Logs data indexed in Elasticsearch
 
@@ -212,6 +224,21 @@ Once you check out the code from GitHub, you can build it using Maven. To disabl
 mvn clean install -Dgpg.skip=true
 ```
 
+## Running locally
+
+After building from source you can run the applicaiton locally using any of these three Maven profiles: `Stdout`, `Elasticsearch` or `S3`. For example: 
+```
+mvn exec:java -P Elasticsearch
+```
+
+The Maven profile defines which connector destination you would use.
+
+You can configure your application by updating the relevant [properties file][properties-files] for the Maven profile you choose. You can also override any setting in the properties file using JVM system properties as in the following example:
+
+```
+mvn exec:java -P Stdout -DkinesisInputStream=application-log-stream -DregionName=us-west-2
+```
+
 ## Related Resources
 
 + [Amazon CloudWatch Logs][aws-cloudwatch-logs]
@@ -233,6 +260,8 @@ mvn clean install -Dgpg.skip=true
 [cwl-subscriptions]: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/Subscriptions.html
 [elasticsearch]: https://www.elastic.co/
 [kibana]: https://www.elastic.co/products/kibana
+[kibana3]: https://www.elastic.co/guide/en/kibana/3.0/index.html
+[kibana4]: https://www.elastic.co/guide/en/kibana/4.1/index.html
 [amazon-kinesis-connectors]: https://github.com/awslabs/amazon-kinesis-connectors
 [aws-cloudformation]: http://aws.amazon.com/cloudformation/
 [aws-lambda]: http://aws.amazon.com/lambda/
@@ -242,12 +271,12 @@ mvn clean install -Dgpg.skip=true
 [dashboard-vpc]: https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Full-VPCFlowLogs-Dashboard.png
 [dashboard-lambda]: https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Full-Lambda-Dashboard.png
 [dashboard-cloudtrail]: https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Full-CloudTrail-Dashboard.png
-[dashboard-lambda-details]: https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/Full-Lambda-Dashboard-Zoom.png
 [sending-vpc-flow-logs]: https://aws.amazon.com/blogs/aws/vpc-flow-logs-log-and-view-network-traffic-flows/
 [sending-cloudtrail-logs]: http://docs.aws.amazon.com/awscloudtrail/latest/userguide/send-cloudtrail-events-to-cloudwatch-logs.html
 [object-types]: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-object-type.html
 [pattern-syntax]: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/FilterAndPatternSyntax.html
 [cfn-template]: https://github.com/awslabs/cloudwatch-logs-subscription-consumer/blob/master/configuration/cloudformation/cwl-elasticsearch.template
+[properties-files]: https://github.com/awslabs/cloudwatch-logs-subscription-consumer/tree/master/src/main/resources
 [ec2-security-groups]: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html
 [http-basic-auth]: https://en.wikipedia.org/wiki/Basic_access_authentication
 [nginx]: http://nginx.org/

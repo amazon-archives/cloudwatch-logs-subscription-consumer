@@ -4,7 +4,7 @@
     "query": {
       "list": {
         "0": {
-          "query": "$.eventSource:dynamodb.amazonaws.com",
+          "query": "eventSource:dynamodb.amazonaws.com",
           "alias": "DynamoDB",
           "color": "#7EB26D",
           "id": 0,
@@ -19,7 +19,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.eventSource:monitoring.amazonaws.com"
+          "query": "eventSource:monitoring.amazonaws.com"
         },
         "2": {
           "id": 2,
@@ -28,7 +28,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.eventSource:elasticmapreduce.amazonaws.com"
+          "query": "eventSource:elasticmapreduce.amazonaws.com"
         },
         "3": {
           "id": 3,
@@ -37,7 +37,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.eventSource:autoscaling.amazonaws.com"
+          "query": "eventSource:autoscaling.amazonaws.com"
         },
         "4": {
           "id": 4,
@@ -46,7 +46,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.eventSource:kms.amazonaws.com"
+          "query": "eventSource:kms.amazonaws.com"
         },
         "5": {
           "id": 5,
@@ -55,7 +55,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.eventSource:kinesis.amazonaws.com"
+          "query": "eventSource:kinesis.amazonaws.com"
         },
         "6": {
           "id": 6,
@@ -64,7 +64,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.eventSource:elasticloadbalancing.amazonaws.com"
+          "query": "eventSource:elasticloadbalancing.amazonaws.com"
         },
         "7": {
           "id": 7,
@@ -73,7 +73,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.eventSource:ec2.amazonaws.com"
+          "query": "eventSource:ec2.amazonaws.com"
         },
         "8": {
           "id": 8,
@@ -82,7 +82,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.eventSource:signin.amazonaws.com"
+          "query": "eventSource:signin.amazonaws.com"
         },
         "9": {
           "id": 9,
@@ -91,7 +91,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.eventSource:iam.amazonaws.com"
+          "query": "eventSource:iam.amazonaws.com"
         },
         "10": {
           "id": 10,
@@ -100,7 +100,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.eventSource:sns.amazonaws.com"
+          "query": "eventSource:sns.amazonaws.com"
         },
         "11": {
           "id": 11,
@@ -109,7 +109,7 @@
           "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": "$.userIdentity.type:Root"
+          "query": "userIdentity.type:Root"
         },
         "12": {
           "id": 12,
@@ -151,7 +151,7 @@
       "list": {
         "0": {
           "type": "time",
-          "field": "$.eventTime",
+          "field": "eventTime",
           "from": "now-3h",
           "to": "now",
           "mandate": "must",
@@ -192,7 +192,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -265,7 +265,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -338,7 +338,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -411,7 +411,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -484,7 +484,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -557,7 +557,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -630,7 +630,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -703,7 +703,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -789,7 +789,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -862,7 +862,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -935,7 +935,7 @@
           "type": "histogram",
           "loadingEditor": false,
           "mode": "count",
-          "time_field": "$.eventTime",
+          "time_field": "eventTime",
           "value_field": null,
           "x-axis": true,
           "y-axis": true,
@@ -1031,7 +1031,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.eventSource",
+          "field": "eventSource",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1062,7 +1062,7 @@
           "editable": true,
           "type": "terms",
           "loadingEditor": false,
-          "field": "$.eventSource",
+          "field": "eventSource",
           "exclude": [],
           "missing": false,
           "other": false,
@@ -1124,7 +1124,7 @@
           "pages": 10,
           "offset": 0,
           "sort": [
-            "$.eventTime",
+            "eventTime",
             "desc"
           ],
           "style": {
@@ -1132,14 +1132,14 @@
           },
           "overflow": "min-height",
           "fields": [
-            "$.eventTime",
-            "$.sourceIPAddress",
-            "$.userIdentity.type",
-            "$.userAgent",
-            "$.eventName",
-            "$.eventType",
-            "$.responseElements.ConsoleLogin",
-            "$.additionalEventData.MFAUsed"
+            "eventTime",
+            "sourceIPAddress",
+            "userIdentity.type",
+            "userAgent",
+            "eventName",
+            "eventType",
+            "responseElements.ConsoleLogin",
+            "additionalEventData.MFAUsed"
           ],
           "highlight": [],
           "sortable": true,
@@ -1159,7 +1159,7 @@
           "title": "AWS Console Sign-Ins",
           "all_fields": false,
           "localTime": true,
-          "timeField": "$.eventTime"
+          "timeField": "eventTime"
         },
         {
           "error": false,
@@ -1173,7 +1173,7 @@
           "pages": 10,
           "offset": 0,
           "sort": [
-            "$.eventTime",
+            "eventTime",
             "desc"
           ],
           "style": {
@@ -1181,12 +1181,12 @@
           },
           "overflow": "min-height",
           "fields": [
-            "$.eventTime",
-            "$.eventName",
-            "$.requestParameters.instanceId",
-            "$.sourceIPAddress",
-            "$.userIdentity.type",
-            "$.userAgent"
+            "eventTime",
+            "eventName",
+            "requestParameters.instanceId",
+            "sourceIPAddress",
+            "userIdentity.type",
+            "userAgent"
           ],
           "highlight": [],
           "sortable": true,
@@ -1206,7 +1206,7 @@
           "title": "EC2 Events",
           "all_fields": false,
           "localTime": true,
-          "timeField": "$.eventTime"
+          "timeField": "eventTime"
         },
         {
           "error": false,
@@ -1220,7 +1220,7 @@
           "pages": 10,
           "offset": 0,
           "sort": [
-            "$.eventTime",
+            "eventTime",
             "desc"
           ],
           "style": {
@@ -1228,12 +1228,12 @@
           },
           "overflow": "min-height",
           "fields": [
-            "$.eventTime",
-            "$.eventName",
-            "$.requestParameters.streamName",
-            "$.userIdentity.type",
-            "$.userAgent",
-            "$.sourceIPAddress"
+            "eventTime",
+            "eventName",
+            "requestParameters.streamName",
+            "userIdentity.type",
+            "userAgent",
+            "sourceIPAddress"
           ],
           "highlight": [],
           "sortable": true,
@@ -1253,7 +1253,7 @@
           "title": "Kinesis Events",
           "all_fields": false,
           "localTime": true,
-          "timeField": "$.eventTime"
+          "timeField": "eventTime"
         },
         {
           "error": false,
@@ -1267,7 +1267,7 @@
           "pages": 10,
           "offset": 0,
           "sort": [
-            "$.eventTime",
+            "eventTime",
             "desc"
           ],
           "style": {
@@ -1275,12 +1275,12 @@
           },
           "overflow": "min-height",
           "fields": [
-            "$.eventTime",
-            "$.eventName",
-            "$.userIdentity.type",
-            "$.userIdentity.userName",
-            "$.userAgent",
-            "$.requestParameters.autoScalingGroupName"
+            "eventTime",
+            "eventName",
+            "userIdentity.type",
+            "userIdentity.userName",
+            "userAgent",
+            "requestParameters.autoScalingGroupName"
           ],
           "highlight": [],
           "sortable": true,
@@ -1300,7 +1300,7 @@
           "title": "Autoscaling Events",
           "all_fields": false,
           "localTime": true,
-          "timeField": "$.eventTime"
+          "timeField": "eventTime"
         },
         {
           "error": false,
@@ -1314,7 +1314,7 @@
           "pages": 10,
           "offset": 0,
           "sort": [
-            "$.eventTime",
+            "eventTime",
             "desc"
           ],
           "style": {
@@ -1322,11 +1322,11 @@
           },
           "overflow": "min-height",
           "fields": [
-            "$.eventTime",
-            "$.eventName",
-            "$.sourceIPAddress",
-            "$.userIdentity.type",
-            "$.requestParameters.tableName"
+            "eventTime",
+            "eventName",
+            "sourceIPAddress",
+            "userIdentity.type",
+            "requestParameters.tableName"
           ],
           "highlight": [],
           "sortable": true,
@@ -1346,7 +1346,7 @@
           "title": "DynamoDB Events",
           "all_fields": false,
           "localTime": true,
-          "timeField": "$.eventTime"
+          "timeField": "eventTime"
         },
         {
           "error": false,
@@ -1360,7 +1360,7 @@
           "pages": 10,
           "offset": 0,
           "sort": [
-            "$.eventTime",
+            "eventTime",
             "desc"
           ],
           "style": {
@@ -1368,13 +1368,13 @@
           },
           "overflow": "min-height",
           "fields": [
-            "$.eventTime",
-            "$.eventName",
-            "$.requestParameters.namespace",
-            "$.requestParameters.metricName",
-            "$.sourceIPAddress",
-            "$.userIdentity.type",
-            "$.userAgent"
+            "eventTime",
+            "eventName",
+            "requestParameters.namespace",
+            "requestParameters.metricName",
+            "sourceIPAddress",
+            "userIdentity.type",
+            "userAgent"
           ],
           "highlight": [],
           "sortable": true,
@@ -1394,7 +1394,7 @@
           "title": "CloudWatch Events",
           "all_fields": false,
           "localTime": true,
-          "timeField": "$.eventTime"
+          "timeField": "eventTime"
         },
         {
           "error": false,
@@ -1408,7 +1408,7 @@
           "pages": 10,
           "offset": 0,
           "sort": [
-            "$.eventTime",
+            "eventTime",
             "desc"
           ],
           "style": {
@@ -1416,12 +1416,12 @@
           },
           "overflow": "min-height",
           "fields": [
-            "$.eventTime",
-            "$.eventName",
-            "$.sourceIPAddress",
-            "$.userIdentity.type",
-            "$.userAgent",
-            "$.userIdentity.sessionContext.sessionIssuer.arn"
+            "eventTime",
+            "eventName",
+            "sourceIPAddress",
+            "userIdentity.type",
+            "userAgent",
+            "userIdentity.sessionContext.sessionIssuer.arn"
           ],
           "highlight": [],
           "sortable": true,
@@ -1441,7 +1441,7 @@
           "title": "IAM Events",
           "all_fields": false,
           "localTime": true,
-          "timeField": "$.eventTime"
+          "timeField": "eventTime"
         },
         {
           "error": false,
@@ -1455,7 +1455,7 @@
           "pages": 10,
           "offset": 0,
           "sort": [
-            "$.eventTime",
+            "eventTime",
             "desc"
           ],
           "style": {
@@ -1463,13 +1463,13 @@
           },
           "overflow": "min-height",
           "fields": [
-            "$.eventTime",
-            "$.eventSource",
-            "$.eventName",
-            "$.userIdentity.userName",
-            "$.userIdentity.type",
-            "$.sourceIPAddress",
-            "$.userAgent"
+            "eventTime",
+            "eventSource",
+            "eventName",
+            "userIdentity.userName",
+            "userIdentity.type",
+            "sourceIPAddress",
+            "userAgent"
           ],
           "highlight": [],
           "sortable": true,
@@ -1502,7 +1502,7 @@
           "title": "All Events",
           "all_fields": false,
           "localTime": true,
-          "timeField": "$.eventTime"
+          "timeField": "eventTime"
         }
       ],
       "notice": false
@@ -1539,12 +1539,7 @@
       "notice": false,
       "query": "*",
       "pinned": true,
-      "history": [
-        "$.eventSource:sts.amazonaws.com",
-        "$.eventSource:elasticmapreduce.amazonaws.com",
-        "$.eventSource:monitoring.amazonaws.com",
-        "$.eventSource:datapipeline.amazonaws.com"
-      ],
+      "history": [],
       "remember": 10,
       "enable": true
     },
@@ -1582,7 +1577,7 @@
         "2h",
         "1d"
       ],
-      "timefield": "$.eventTime",
+      "timefield": "eventTime",
       "enable": true,
       "now": true,
       "filter_id": 0

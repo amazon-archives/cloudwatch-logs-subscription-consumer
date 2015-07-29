@@ -25,8 +25,7 @@ import org.joda.time.format.DateTimeFormatter;
 import com.amazonaws.services.kinesis.connectors.elasticsearch.ElasticsearchObject;
 import com.amazonaws.services.logs.subscriptions.CloudWatchLogsEvent;
 import com.amazonaws.services.logs.subscriptions.CloudWatchLogsSubscriptionTransformer;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.amazonaws.util.json.JSONException;
 
 /**
  * Transforms CloudWatchLogsEvent records to ElasticsearchObject records.
@@ -34,8 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ElasticsearchTransformer extends CloudWatchLogsSubscriptionTransformer<ElasticsearchObject> {
 
     private static final Log LOG = LogFactory.getLog(ElasticsearchTransformer.class);
-
-    private static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper();
 
     private static final DateTimeFormatter DAY_SUFFIX_FORMATTER = DateTimeFormat.forPattern("yyyy.MM.dd").withZone(
             DateTimeZone.UTC);
@@ -45,24 +42,24 @@ public class ElasticsearchTransformer extends CloudWatchLogsSubscriptionTransfor
     @Override
     public ElasticsearchObject fromClass(CloudWatchLogsEvent record) throws IOException {
 
-        // convert the log event to an Elasticsearch document
-        CloudWatchLogsElasticsearchDocument document = new CloudWatchLogsElasticsearchDocument(record);
-
-        // daily indexes are used for bulk expiry
-        String index = INDEX_NAME_PREFIX + DAY_SUFFIX_FORMATTER.print(document.getTimestamp());
-
-        String type = document.getLogGroup();
-        String id = document.getId();
-
         try {
+            // convert the log event to an Elasticsearch document
+            CloudWatchLogsElasticsearchDocument document = new CloudWatchLogsElasticsearchDocument(record);
+
+            // daily indexes are used for bulk expiry
+            String index = INDEX_NAME_PREFIX + DAY_SUFFIX_FORMATTER.print(document.getTimestamp());
+
+            String type = document.getLogGroup();
+            String id = document.getId();
+
             // this is the structured log event in JSON format
-            String source = JSON_OBJECT_MAPPER.writeValueAsString(document);
+            String source = document.getSource();
 
             ElasticsearchObject elasticsearchObject = new ElasticsearchObject(index, type, id, source);
             elasticsearchObject.setCreate(true); // creates the index if it doesn't exist
 
             return elasticsearchObject;
-        } catch (JsonProcessingException e) {
+        } catch (JSONException e) {
             String message = "Error serializing the Elasticsearch document to JSON: " + e.getMessage();
             LOG.error(message);
             throw new IOException(message, e);

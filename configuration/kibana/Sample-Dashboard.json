@@ -205,11 +205,7 @@
       "notice": false,
       "query": "*",
       "pinned": true,
-      "history": [
-        "",
-        "$.action:*",
-        "$.action:REJECT"
-      ],
+      "history": [],
       "remember": 10,
       "enable": true
     },

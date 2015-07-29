@@ -1,0 +1,7 @@
+{
+  "template": ".kibana",
+  "order": 2,
+  "settings" : {
+      "number_of_shards" : 1
+  }
+}

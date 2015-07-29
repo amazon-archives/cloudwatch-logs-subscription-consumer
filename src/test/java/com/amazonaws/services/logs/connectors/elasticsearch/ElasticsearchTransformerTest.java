@@ -75,11 +75,11 @@ public class ElasticsearchTransformerTest {
         assertEquals("i-c3f9bec9", sourceNode.get("@log_stream").asText());
         assertEquals("127.0.0.1 frank GET 200 4535", sourceNode.get("@message").asText());
 
-        assertEquals(200, sourceNode.get("$").get("status_code").asLong());
-        assertEquals("GET", sourceNode.get("$").get("verb").asText());
-        assertEquals(4535, sourceNode.get("$").get("response_size").asLong());
-        assertEquals("frank", sourceNode.get("$").get("user").asText());
-        assertEquals("127.0.0.1", sourceNode.get("$").get("ip").asText());
+        assertEquals(200, sourceNode.get("status_code").asLong());
+        assertEquals("GET", sourceNode.get("verb").asText());
+        assertEquals(4535, sourceNode.get("response_size").asLong());
+        assertEquals("frank", sourceNode.get("user").asText());
+        assertEquals("127.0.0.1", sourceNode.get("ip").asText());
 
         // event 2
         sourceNode = JSON_OBJECT_MAPPER.readTree(new StringReader(elasticsearchDocuments.get(1).getSource()));
@@ -91,11 +91,11 @@ public class ElasticsearchTransformerTest {
         assertEquals("i-c3f9bec9", sourceNode.get("@log_stream").asText());
         assertEquals("127.0.0.1 alice POST 404 34", sourceNode.get("@message").asText());
 
-        assertEquals(404, sourceNode.get("$").get("status_code").asLong());
-        assertEquals("POST", sourceNode.get("$").get("verb").asText());
-        assertEquals(34, sourceNode.get("$").get("response_size").asLong());
-        assertEquals("alice", sourceNode.get("$").get("user").asText());
-        assertEquals("127.0.0.1", sourceNode.get("$").get("ip").asText());
+        assertEquals(404, sourceNode.get("status_code").asLong());
+        assertEquals("POST", sourceNode.get("verb").asText());
+        assertEquals(34, sourceNode.get("response_size").asLong());
+        assertEquals("alice", sourceNode.get("user").asText());
+        assertEquals("127.0.0.1", sourceNode.get("ip").asText());
     }
 
     @Test
@@ -138,9 +138,9 @@ public class ElasticsearchTransformerTest {
         assertTrue(sourceNode.get("@message").asText().startsWith("{"));
         assertTrue(sourceNode.get("@message").asText().endsWith("}"));
 
-        assertEquals("1.02", sourceNode.get("$").get("eventVersion").asText());
-        assertEquals("Root", sourceNode.get("$").get("userIdentity").get("type").asText());
-        assertEquals("signin.amazonaws.com", sourceNode.get("$").get("eventSource").asText());
+        assertEquals("1.02", sourceNode.get("eventVersion").asText());
+        assertEquals("Root", sourceNode.get("userIdentity").get("type").asText());
+        assertEquals("signin.amazonaws.com", sourceNode.get("eventSource").asText());
 
         // event 2
         sourceNode = JSON_OBJECT_MAPPER.readTree(new StringReader(elasticsearchDocuments.get(1).getSource()));
@@ -153,9 +153,9 @@ public class ElasticsearchTransformerTest {
         assertTrue(sourceNode.get("@message").asText().startsWith("{"));
         assertTrue(sourceNode.get("@message").asText().endsWith("}"));
 
-        assertEquals("1.02", sourceNode.get("$").get("eventVersion").asText());
-        assertEquals("Root", sourceNode.get("$").get("userIdentity").get("type").asText());
-        assertEquals("cloudtrail.amazonaws.com", sourceNode.get("$").get("eventSource").asText());
+        assertEquals("1.02", sourceNode.get("eventVersion").asText());
+        assertEquals("Root", sourceNode.get("userIdentity").get("type").asText());
+        assertEquals("cloudtrail.amazonaws.com", sourceNode.get("eventSource").asText());
     }
 
     @Test
@@ -199,11 +199,11 @@ public class ElasticsearchTransformerTest {
                 "2015-01-13T02:28:53.213Z c342155b-1ec0-11e5-b0e2-f317438eb2f6 { \"key1\": 100, \"key2\": \"value\", \"key3\": { \"key4\": \"level2\" } }",
                 sourceNode.get("@message").asText());
 
-        assertEquals("2015-01-13T02:28:53.213Z", sourceNode.get("$").get("timestamp").asText());
-        assertEquals("c342155b-1ec0-11e5-b0e2-f317438eb2f6", sourceNode.get("$").get("request_id").asText());
-        assertEquals(100, sourceNode.get("$").get("event").get("key1").asLong());
-        assertEquals("value", sourceNode.get("$").get("event").get("key2").asText());
-        assertEquals("level2", sourceNode.get("$").get("event").get("key3").get("key4").asText());
+        assertEquals("2015-01-13T02:28:53.213Z", sourceNode.get("timestamp").asText());
+        assertEquals("c342155b-1ec0-11e5-b0e2-f317438eb2f6", sourceNode.get("request_id").asText());
+        assertEquals(100, sourceNode.get("$event").get("key1").asLong());
+        assertEquals("value", sourceNode.get("$event").get("key2").asText());
+        assertEquals("level2", sourceNode.get("$event").get("key3").get("key4").asText());
 
         // event 2
         sourceNode = JSON_OBJECT_MAPPER.readTree(new StringReader(elasticsearchDocuments.get(1).getSource()));
@@ -216,8 +216,8 @@ public class ElasticsearchTransformerTest {
         assertEquals("2015-01-13T02:29:03.456Z c342155b-1ec0-11e5-b0e2-f317438eb2f6 Hello World",
                 sourceNode.get("@message").asText());
 
-        assertEquals("2015-01-13T02:29:03.456Z", sourceNode.get("$").get("timestamp").asText());
-        assertEquals("c342155b-1ec0-11e5-b0e2-f317438eb2f6", sourceNode.get("$").get("request_id").asText());
-        assertEquals("Hello World", sourceNode.get("$").get("event").asText());
+        assertEquals("2015-01-13T02:29:03.456Z", sourceNode.get("timestamp").asText());
+        assertEquals("c342155b-1ec0-11e5-b0e2-f317438eb2f6", sourceNode.get("request_id").asText());
+        assertEquals("Hello World", sourceNode.get("event").asText());
     }
 }
