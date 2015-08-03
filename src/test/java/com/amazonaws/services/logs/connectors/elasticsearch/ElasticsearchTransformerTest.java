@@ -201,6 +201,9 @@ public class ElasticsearchTransformerTest {
 
         assertEquals("2015-01-13T02:28:53.213Z", sourceNode.get("timestamp").asText());
         assertEquals("c342155b-1ec0-11e5-b0e2-f317438eb2f6", sourceNode.get("request_id").asText());
+
+        assertEquals("{ \"key1\": 100, \"key2\": \"value\", \"key3\": { \"key4\": \"level2\" } }",
+                sourceNode.get("event").asText());
         assertEquals(100, sourceNode.get("$event").get("key1").asLong());
         assertEquals("value", sourceNode.get("$event").get("key2").asText());
         assertEquals("level2", sourceNode.get("$event").get("key3").get("key4").asText());
@@ -219,5 +222,25 @@ public class ElasticsearchTransformerTest {
         assertEquals("2015-01-13T02:29:03.456Z", sourceNode.get("timestamp").asText());
         assertEquals("c342155b-1ec0-11e5-b0e2-f317438eb2f6", sourceNode.get("request_id").asText());
         assertEquals("Hello World", sourceNode.get("event").asText());
+
+        // event 3
+        sourceNode = JSON_OBJECT_MAPPER.readTree(new StringReader(elasticsearchDocuments.get(2).getSource()));
+
+        assertEquals("49545295115971876468408574808419866449919668408574808465", sourceNode.get("@id").asText());
+        assertEquals(1421200848954L, sourceNode.get("@timestamp").asLong());
+        assertEquals("123456789012", sourceNode.get("@owner").asText());
+        assertEquals("/aws/lambda/HelloWorld", sourceNode.get("@log_group").asText());
+        assertEquals("2015/06/30/1f77bc4743204b22b0d42cf3b85f40c7", sourceNode.get("@log_stream").asText());
+        assertEquals(
+                "2015-01-14T02:00:48.954Z c342155b-1ec0-11e5-b0e2-f317438eb2f6 Received event: { \"key1\": 100, \"key2\": \"value\", \"key3\": { \"key4\": \"level2\" } }",
+                sourceNode.get("@message").asText());
+
+        assertEquals("2015-01-14T02:00:48.954Z", sourceNode.get("timestamp").asText());
+        assertEquals("c342155b-1ec0-11e5-b0e2-f317438eb2f6", sourceNode.get("request_id").asText());
+        assertEquals("Received event: { \"key1\": 100, \"key2\": \"value\", \"key3\": { \"key4\": \"level2\" } }",
+                sourceNode.get("event").asText());
+        assertEquals(100, sourceNode.get("$event").get("key1").asLong());
+        assertEquals("value", sourceNode.get("$event").get("key2").asText());
+        assertEquals("level2", sourceNode.get("$event").get("key3").get("key4").asText());
     }
 }

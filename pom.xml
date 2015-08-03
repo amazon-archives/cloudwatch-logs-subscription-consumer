@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.amazonaws</groupId>
     <artifactId>cloudwatch-logs-subscription-consumer</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <name>CloudWatch Logs Subscription Consumer</name>
     <description>The CloudWatch Logs Subscription Consumer helps Java developers consume a real-time feed of CloudWatch Logs data for custom processing, analysis, or loading to other systems.</description>
     <url>https://aws.amazon.com/cloudwatch</url>

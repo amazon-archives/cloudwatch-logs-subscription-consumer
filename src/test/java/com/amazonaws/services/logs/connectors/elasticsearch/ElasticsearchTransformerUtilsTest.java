@@ -14,33 +14,43 @@
  */
 package com.amazonaws.services.logs.connectors.elasticsearch;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
 public class ElasticsearchTransformerUtilsTest {
 
     @Test
-    public void isMessageValidJson() {
-        assertFalse(ElasticsearchTransformerUtils.isMessageValidJson("2"));
-        assertFalse(ElasticsearchTransformerUtils.isMessageValidJson("\"value\""));
-        assertFalse(ElasticsearchTransformerUtils.isMessageValidJson("100 \"value\""));
-        assertFalse(ElasticsearchTransformerUtils.isMessageValidJson("{ \"key\": 100"));
-        assertFalse(ElasticsearchTransformerUtils.isMessageValidJson("{ \"key\": \"100\""));
-        assertFalse(ElasticsearchTransformerUtils.isMessageValidJson("{ \"tree\": { \"key1\": \"100\" \"key2\": \"200\" } }"));
-        assertFalse(ElasticsearchTransformerUtils.isMessageValidJson("outside { \"tree\": { \"key1\": \"100\" \"key2\": \"200\" } }"));
-        assertFalse(ElasticsearchTransformerUtils.isMessageValidJson("{ \"tree\": { \"key1\": \"100\" \"key2\": \"200\" } } outside"));
-        assertFalse(ElasticsearchTransformerUtils.isMessageValidJson("{ \"array\": [ }"));
+    public void extractJson() {
+        assertNull(ElasticsearchTransformerUtils.extractJson("2"));
+        assertNull(ElasticsearchTransformerUtils.extractJson("\"value\""));
+        assertNull(ElasticsearchTransformerUtils.extractJson("100 \"value\""));
+        assertNull(ElasticsearchTransformerUtils.extractJson("{ \"key\": 100"));
+        assertNull(ElasticsearchTransformerUtils.extractJson("{ \"key\": \"100\""));
+        assertNull(ElasticsearchTransformerUtils.extractJson("{ \"tree\": { \"key1\": \"100\" \"key2\": \"200\" } }"));
+        assertNull(ElasticsearchTransformerUtils.extractJson("outside { \"tree\": { \"key1\": \"100\" \"key2\": \"200\" } }"));
+        assertNull(ElasticsearchTransformerUtils.extractJson("{ \"tree\": { \"key1\": \"100\" \"key2\": \"200\" } } outside"));
+        assertNull(ElasticsearchTransformerUtils.extractJson("{ \"array\": [ }"));
 
-        assertTrue(ElasticsearchTransformerUtils.isMessageValidJson("{ \"key\": 100 }"));
-        assertTrue(ElasticsearchTransformerUtils.isMessageValidJson("{ \"key\": \"100\" }"));
-        assertTrue(ElasticsearchTransformerUtils.isMessageValidJson("{ \"key1\": \"100\", \"key2\": \"200\" }"));
-        assertTrue(ElasticsearchTransformerUtils.isMessageValidJson("{ \"tree\": { \"key1\": \"100\", \"key2\": \"200\" } }"));
-        assertTrue(ElasticsearchTransformerUtils.isMessageValidJson("{ \"tree\": \n{ \"key1\": \"100\", \"key2\": \"200\" } }"));
-        assertTrue(ElasticsearchTransformerUtils.isMessageValidJson("   { \"tree\":\n \n{ \"key1\": \"100\",\n \"key2\": \"200\" }\n }\n   "));
-        assertTrue(ElasticsearchTransformerUtils.isMessageValidJson("{ \"array\": [ { \"key1\": \"100\", \"key2\": \"200\" } ] }"));
-        assertTrue(ElasticsearchTransformerUtils.isMessageValidJson("{ \"array\": [ { \"key1\": \"100\" }, { \"key2\": \"200\" } ] }"));
-        assertTrue(ElasticsearchTransformerUtils.isMessageValidJson("{ \"array\": [] }"));
+        assertNotNull(ElasticsearchTransformerUtils.extractJson("{ \"key\": 100 }"));
+        assertNotNull(ElasticsearchTransformerUtils.extractJson("{ \"key\": \"100\" }"));
+        assertNotNull(ElasticsearchTransformerUtils.extractJson("{ \"key1\": \"100\", \"key2\": \"200\" }"));
+        assertNotNull(ElasticsearchTransformerUtils.extractJson("{ \"tree\": { \"key1\": \"100\", \"key2\": \"200\" } }"));
+        assertNotNull(ElasticsearchTransformerUtils.extractJson("{ \"tree\": \n{ \"key1\": \"100\", \"key2\": \"200\" } }"));
+        assertNotNull(ElasticsearchTransformerUtils.extractJson("   { \"tree\":\n \n{ \"key1\": \"100\",\n \"key2\": \"200\" }\n }\n   "));
+        assertNotNull(ElasticsearchTransformerUtils.extractJson("{ \"array\": [ { \"key1\": \"100\", \"key2\": \"200\" } ] }"));
+        assertNotNull(ElasticsearchTransformerUtils.extractJson("{ \"array\": [ { \"key1\": \"100\" }, { \"key2\": \"200\" } ] }"));
+        assertNotNull(ElasticsearchTransformerUtils.extractJson("{ \"array\": [] }"));
+
+        assertEquals("{ \"key\": \"100\" }", ElasticsearchTransformerUtils.extractJson("{ \"key\": \"100\" }"));
+        assertEquals("{ \"key\": \"100\" }",
+                ElasticsearchTransformerUtils.extractJson("Received: { \"key\": \"100\" }"));
+        assertEquals("{ \"key\": \"100\" }",
+                ElasticsearchTransformerUtils.extractJson("Received event:     { \"key\": \"100\" }"));
+        assertEquals(
+                "{ \"array\": [ { \"key1\": \"100\" }, { \"key2\": \"200\" } ] }",
+                ElasticsearchTransformerUtils.extractJson("Received event: { \"array\": [ { \"key1\": \"100\" }, { \"key2\": \"200\" } ] }"));
     }
 }

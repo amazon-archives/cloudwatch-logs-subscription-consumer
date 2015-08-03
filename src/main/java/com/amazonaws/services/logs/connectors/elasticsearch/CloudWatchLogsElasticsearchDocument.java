@@ -74,23 +74,30 @@ public class CloudWatchLogsElasticsearchDocument {
                 if (value == null) {
                     // nothing to add
                     continue;
-                } else if (ElasticsearchTransformerUtils.isMessageValidJson(value)) {
-                    // the field value is valid json - put it as a nested object
-                    extractedFieldsInJson.put(JSON_FIELD_NAME_PREFIX + fieldName, new JSONObject(value));
-                } else if (StringUtils.isNumeric(value)) {
+                }
+
+                if (StringUtils.isNumeric(value)) {
                     // the field value is a number - put it as a double
                     extractedFieldsInJson.put(fieldName, Double.parseDouble(value));
-                } else {
-                    // else put the field as a string
-                    extractedFieldsInJson.put(fieldName, value);
+                    continue;
                 }
+
+                String jsonSubString = ElasticsearchTransformerUtils.extractJson(value);
+
+                if (jsonSubString != null) {
+                    // the field value contains valid json - copy the json to a new Elasticsearch object field
+                    extractedFieldsInJson.put(JSON_FIELD_NAME_PREFIX + fieldName, new JSONObject(jsonSubString));
+                }
+
+                // put the raw extracted field as a string
+                extractedFieldsInJson.put(fieldName, value);
             }
 
             return extractedFieldsInJson;
         }
 
         // if the message is valid JSON, use the message as is for Elasticsearch fields
-        if (ElasticsearchTransformerUtils.isMessageValidJson(message)) {
+        if (ElasticsearchTransformerUtils.extractJson(message) != null) {
             return new JSONObject(message);
         }
 

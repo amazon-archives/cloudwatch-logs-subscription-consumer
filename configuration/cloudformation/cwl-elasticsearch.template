@@ -137,7 +137,7 @@
   "Mappings" : {
     "Constants" : {
       "S3DownloadPath"   : { "Value": "aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer" },
-      "S3DownloadFile"   : { "Value": "cloudwatch-logs-subscription-consumer-1.1.0" }
+      "S3DownloadFile"   : { "Value": "cloudwatch-logs-subscription-consumer-1.2.0" }
     },
 
     "AWSInstanceType2Arch" : {

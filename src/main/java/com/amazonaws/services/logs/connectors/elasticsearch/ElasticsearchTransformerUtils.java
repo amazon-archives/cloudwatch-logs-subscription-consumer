@@ -25,16 +25,27 @@ public class ElasticsearchTransformerUtils {
 
     private ElasticsearchTransformerUtils() {}
 
-    public static boolean isMessageValidJson(String message) {
+    /**
+     * Checks if the substring from the first occurrence of { is valid json and
+     * returns the substring. Otherwise returns null.
+     */
+    public static String extractJson(String message) {
+        int jsonStart = message.indexOf("{");
+
+        if (jsonStart < 0) {
+            return null;
+        }
+
+        String jsonSubString = message.substring(jsonStart);
 
         try {
-            JsonNode rootNode = JSON_OBJECT_MAPPER.readTree(message);
+            JsonNode rootNode = JSON_OBJECT_MAPPER.readTree(jsonSubString);
             if (rootNode.isValueNode()) {
-                return false;
+                return null;
             }
         } catch (IOException e) {
-            return false;
+            return null;
         }
-        return true;
+        return jsonSubString;
     }
 }
