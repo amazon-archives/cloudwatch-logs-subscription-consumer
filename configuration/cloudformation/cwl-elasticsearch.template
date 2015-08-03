@@ -135,6 +135,11 @@
   },
 
   "Mappings" : {
+    "Constants" : {
+      "S3DownloadPath"   : { "Value": "aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer" },
+      "S3DownloadFile"   : { "Value": "cloudwatch-logs-subscription-consumer-1.1.0" }
+    },
+
     "AWSInstanceType2Arch" : {
       "t2.micro"    : { "Arch" : "HVM64"  },
       "t2.small"    : { "Arch" : "HVM64"  },
@@ -580,10 +585,14 @@
             },
             "commands" : {
               "00_copyNginxConfig": {
-                "command": "cp ./cloudwatch-logs-subscription-consumer-1.1.0/configuration/nginx/nginx.conf /etc/nginx/nginx.conf"
+                "command": { "Fn::Join" : ["", [
+                  "cp ./", { "Fn::FindInMap" : [ "Constants", "S3DownloadFile", "Value" ]} ,"/configuration/nginx/nginx.conf /etc/nginx/nginx.conf"
+                 ]]}
               },
               "01_copyElasticsearchTemplates": {
-                "command": "cp -R ./cloudwatch-logs-subscription-consumer-1.1.0/configuration/elasticsearch/* /etc/elasticsearch/"
+                "command": { "Fn::Join" : ["", [
+                  "cp -R ./", { "Fn::FindInMap" : [ "Constants", "S3DownloadFile", "Value" ]} ,"/configuration/elasticsearch/* /etc/elasticsearch/"
+                ]]}
               }, 
               "02_updateESConfigForNode": {
                 "command": { "Fn::Join" : ["", [
@@ -655,7 +664,7 @@
                     " -DappName=", { "Ref": "KCLLeasesTable" },
                     " -Dlog4j.configuration=log4j-prod.properties",
                     " -DelasticsearchClusterName=elasticsearch",
-                    " -cp cloudwatch-logs-subscription-consumer-1.1.0/cloudwatch-logs-subscription-consumer-1.1.0.jar",
+                    " -cp ", { "Fn::FindInMap" : [ "Constants", "S3DownloadFile", "Value" ]} ,"/", { "Fn::FindInMap" : [ "Constants", "S3DownloadFile", "Value" ]} ,".jar",
                     " com.amazonaws.services.logs.connectors.samples.elasticsearch.ElasticsearchConnector",
                     " > /dev/null 2>&1 & } && disown -h %1"
                   ]]},
@@ -835,8 +844,8 @@
           "cd ~\n",
 
           "# KCL and config files\n",
-          "wget https://s3.amazonaws.com/aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer/cloudwatch-logs-subscription-consumer-1.1.0-cfn.zip || error_exit \"Failed to get cf package\" \n",
-          "unzip cloudwatch-logs-subscription-consumer-1.1.0-cfn.zip || error_exit \"Failed to unzip cf package\" \n",
+          "wget https://s3.amazonaws.com/", { "Fn::FindInMap" : [ "Constants", "S3DownloadPath", "Value" ]} ,"/", { "Fn::FindInMap" : [ "Constants", "S3DownloadFile", "Value" ]} ,"-cfn.zip || error_exit \"Failed to get cf package\" \n",
+          "unzip ", { "Fn::FindInMap" : [ "Constants", "S3DownloadFile", "Value" ]} ,"-cfn.zip || error_exit \"Failed to unzip cf package\" \n",
 
           "# Get Kibana 4\n",
           "wget https://download.elastic.co/kibana/kibana/kibana-4.1.1-linux-x64.tar.gz || error_exit \"Failed to download Kibana 4\" \n",
@@ -859,7 +868,7 @@
           "sed -i 's/elasticsearch:.*/elasticsearch: \"http:\\/\\/\" + window.location.hostname,/g' /usr/share/nginx/html/kibana3/config.js || error_exit \"Failed to update Kibana 3 config\"\n",
 
           "# Add static Kibana 3 dashboards\n",
-          "cp -f cloudwatch-logs-subscription-consumer-1.1.0/configuration/kibana/* /usr/share/nginx/html/kibana3/app/dashboards/ || error_exit \"Failed to copy the Kibana 3 static dashboards\" \n",
+          "cp -f ", { "Fn::FindInMap" : [ "Constants", "S3DownloadFile", "Value" ]} ,"/configuration/kibana/* /usr/share/nginx/html/kibana3/app/dashboards/ || error_exit \"Failed to copy the Kibana 3 static dashboards\" \n",
 
           "# Update Elasticsearch index templates\n",
           "sed -i '5i\\ \\ \\ \\ \\ \\ \"index.number_of_replicas\" : ", { "Ref": "ElasticsearchReplicas" } ,",' /etc/elasticsearch/templates/cwl_template.json || error_exit \"Failed update cwl_template.json\"\n",
