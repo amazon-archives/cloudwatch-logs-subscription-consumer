@@ -26,8 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.amazonaws.services.kinesis.connectors.interfaces.ICollectionTransformer;
 import com.amazonaws.services.kinesis.model.Record;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +42,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class CloudWatchLogsSubscriptionTransformer<T> implements
         ICollectionTransformer<CloudWatchLogsEvent, T> {
 
+    private static final Log LOG = LogFactory.getLog(CloudWatchLogsSubscriptionTransformer.class);
+
     private static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper();
     private static final TypeReference<HashMap<String, String>> MAP_TYPE = new TypeReference<HashMap<String, String>>() {};
 
@@ -46,11 +52,30 @@ public abstract class CloudWatchLogsSubscriptionTransformer<T> implements
         List<CloudWatchLogsEvent> result = new ArrayList<>();
 
         // uncompress the payload
-        byte[] uncompressedPayload = uncompress(record.getData().array());
+        byte[] uncompressedPayload;
+        try {
+            uncompressedPayload = uncompress(record.getData().array());
+        } catch (IOException e) {
+            LOG.error("Unable to uncompress the record. Skipping it.", e);
+            return result;
+        }
 
         // get the JSON root node
         String jsonPayload = new String(uncompressedPayload, Charset.forName("UTF-8"));
-        JsonNode rootNode = JSON_OBJECT_MAPPER.readTree(new StringReader(jsonPayload));
+        JsonNode rootNode;
+        try {
+            rootNode = JSON_OBJECT_MAPPER.readTree(new StringReader(jsonPayload));
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to parse the record as JSON. Skipping it.", e);
+            return result;
+        }
+
+        // only process records whose type is DATA_MESSAGE
+        JsonNode messageTypeNode = rootNode.get("messageType");
+        if (messageTypeNode == null || !messageTypeNode.asText().equals("DATA_MESSAGE")) {
+            LOG.warn("This record is not a data message. Skipping it.");
+            return result;
+        }
 
         // extract the common attributes for all the log events in the batch
         String owner = rootNode.get("owner").asText();

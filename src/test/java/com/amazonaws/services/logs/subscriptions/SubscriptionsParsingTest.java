@@ -15,6 +15,7 @@
 package com.amazonaws.services.logs.subscriptions;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
@@ -91,6 +92,33 @@ public class SubscriptionsParsingTest {
         assertEquals("49545295115971876468408574808465530214343150403450640305", logEvents.get(1).getId());
         assertEquals(1421116143456L, logEvents.get(1).getTimestamp());
         assertNull(logEvents.get(0).getExtractedFields());
+    }
+
+    @Test
+    public void parseControlMessage() throws IOException {
+        verifyRecordIsSkipped(TestUtils.getCompressedTestFile("/control-message-example.json"));
+    }
+
+    @Test
+    public void parseRecordWithNoMessageType() throws IOException {
+        verifyRecordIsSkipped(TestUtils.getCompressedTestFile("/no-message-type-example.json"));
+    }
+
+    @Test
+    public void parseRecordWithInvalidJson() throws IOException {
+        verifyRecordIsSkipped(TestUtils.getCompressedTestFile("/invalid-json-example.json"));
+    }
+
+    private void verifyRecordIsSkipped(byte[] data) throws IOException {
+        CloudWatchLogsSubscriptionTransformer<String> classUnderTest = new CloudWatchLogsSubscriptionToStringTransformer();
+
+        // execute
+        List<CloudWatchLogsEvent> logEvents = new ArrayList<>(
+                classUnderTest.toClass(new Record().withData(ByteBuffer.wrap(data))));
+
+        // verify that the control message gets ignored
+        assertNotNull(logEvents);
+        assertEquals(0, logEvents.size());
     }
 
     private class CloudWatchLogsSubscriptionToStringTransformer extends CloudWatchLogsSubscriptionTransformer<String> {
