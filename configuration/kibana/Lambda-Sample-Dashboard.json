@@ -6,11 +6,11 @@
         "2": {
           "id": 2,
           "color": "#447EBC",
-          "alias": "",
-          "pin": false,
+          "alias": "Lambda Events",
+          "pin": true,
           "type": "lucene",
           "enable": true,
-          "query": ""
+          "query": "@log_group: \"/aws/lambda/*\""
         }
       },
       "ids": [
@@ -60,7 +60,7 @@
             "min": 0
           },
           "queries": {
-            "mode": "all",
+            "mode": "selected",
             "ids": [
               2
             ]
@@ -148,7 +148,8 @@
           "fields": [
             "@timestamp",
             "@log_group",
-            "request_id"
+            "request_id",
+            "event"
           ],
           "highlight": [],
           "sortable": true,
@@ -157,7 +158,9 @@
           "spyable": true,
           "queries": {
             "mode": "selected",
-            "ids": []
+            "ids": [
+              2
+            ]
           },
           "field_list": true,
           "status": "Stable",
