@@ -111,7 +111,7 @@
       "Description": "Choose the format that best describes the type of logs in the selected log group",
       "Type": "String",
       "Default" : "Custom",
-      "AllowedValues" : ["Amazon VPC Flow Logs", "AWS Lambda", "AWS CloudTrail", "Custom"]
+      "AllowedValues" : ["AmazonVPCFlowLogs", "AWSLambda", "AWSCloudTrail", "Custom"]
     },
 
     "SubscriptionFilterPattern" : {
@@ -145,6 +145,13 @@
     "Constants" : {
       "S3DownloadPath"   : { "Value": "aws-cloudwatch/downloads/cloudwatch-logs-subscription-consumer" },
       "S3DownloadFile"   : { "Value": "cloudwatch-logs-subscription-consumer-1.2.0" }
+    },
+
+    "LogFormats" : {
+      "AmazonVPCFlowLogs" : { "Value": "[version, account_id, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytes, start, end, action, log_status]" },
+      "AWSLambda": { "Value": "[timestamp=*Z, request_id=\"*-*\", event]" },
+      "AWSCloudTrail": { "Value": "" },
+      "Custom": { "Value": "" }
     },
 
     "AWSInstanceType2Arch" : {
@@ -206,7 +213,8 @@
   
   "Conditions" : {
     "CreateCWLForStack" : {"Fn::Equals" : [{"Ref" : "MonitorStack"}, "true"]},
-    "NoKeySpecified" : {"Fn::Equals" : [{"Ref" : "KeyName"}, ""]}
+    "NoKeySpecified" : {"Fn::Equals" : [{"Ref" : "KeyName"}, ""]},
+    "CustomLogFormat": {"Fn::Equals" : [{"Ref" : "LogFormat"}, "Custom"]}
   },
 
   "Resources" : {
@@ -581,6 +589,28 @@
       "Condition": "CreateCWLForStack"
     },
 
+    "SubscriptionFilter" : {
+      "Type" : "AWS::Logs::SubscriptionFilter",
+      "DependsOn" : [ "KinesisSubscriptionStream", "CloudWatchLogsKinesisRole", "CloudWatchLogsKinesisPolicy", "WaitCondition" ],
+      "Properties" : {
+        "RoleArn" : { "Fn::GetAtt" : [ "CloudWatchLogsKinesisRole", "Arn" ] },
+        "LogGroupName" : { "Ref": "LogGroupName" },
+        "FilterPattern" : {
+          "Fn::If" : [
+            "CustomLogFormat",
+            { "Ref": "SubscriptionFilterPattern" },
+            { "Fn::FindInMap" : [ "LogFormats", { "Ref": "LogFormat" }, "Value" ]}
+          ]},
+        "DestinationArn" : {
+          "Fn::Join" : [ ":", [ "arn", "aws", "kinesis",
+            { "Ref" : "AWS::Region" },
+            { "Ref" : "AWS::AccountId" },
+            { "Fn::Join" : [ "/", [ "stream", { "Ref": "KinesisSubscriptionStream"} ] ] } ]
+          ]
+        }
+      }
+    },
+
     "ElasticsearchServer": {
       "Type": "AWS::AutoScaling::LaunchConfiguration",
       "Metadata" : {
@@ -606,7 +636,7 @@
                 "command": { "Fn::Join" : ["", [
                   "cp -R ./", { "Fn::FindInMap" : [ "Constants", "S3DownloadFile", "Value" ]} ,"/configuration/elasticsearch/* /etc/elasticsearch/"
                 ]]}
-              }, 
+              },
               "02_updateESConfigForNode": {
                 "command": { "Fn::Join" : ["", [
                   "echo \"",
@@ -628,49 +658,14 @@
                   "/usr/share/elasticsearch/bin/plugin -install lmenezes/elasticsearch-kopf/1.5.5"
                 ]]}
               },
-              "04_deleteSubscriptionFilter": {
-                "command": { "Fn::Join" : ["", [
-                  "aws logs delete-subscription-filter ",
-                      "--log-group-name \"", { "Ref": "LogGroupName" }, "\" ",
-                      "--region \"", { "Ref" : "AWS::Region" }, "\" ",
-                      "--filter-name $(aws logs describe-subscription-filters ",
-                      "--log-group-name ", { "Ref": "LogGroupName" }, " ",
-                      "--region ", { "Ref": "AWS::Region" }, " ",
-                      "--filter-name-prefix \"cwl-cfn-es-\" ",
-                      "| grep filterName | awk -F \\\" '{ print $4 };' )"
-                ]]},
-                "ignoreErrors": true
-              },
-              "05_putSubscriptionFilter": {
-                "command": { "Fn::Join": ["", [
-                  "declare -A FILTERS=(",
-                  "[Amazon VPC Flow Logs]=\"[version, account_id, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytes, start, end, action, log_status]\" ",
-                  "[AWS Lambda]=\"[timestamp=*Z, request_id=\\\"*-*\\\", event]\" ",
-                  "[AWS CloudTrail]=\"\" ",
-                  "[Custom]=\"", { "Ref": "SubscriptionFilterPattern" }, "\" ",
-                  ") && ",
-                  "aws logs put-subscription-filter ",
-                      "--log-group-name \"", { "Ref": "LogGroupName" }, "\" ",
-                      "--filter-name \"cwl-cfn-es-", { "Ref": "KinesisSubscriptionStream" }, "\" ",
-                      "--filter-pattern \"${FILTERS[\"", { "Ref": "LogFormat" }, "\"]}\" ",
-                      "--region \"", { "Ref" : "AWS::Region" }, "\" ",
-                      "--destination-arn \"", 
-                      "arn:aws:kinesis:", { "Ref": "AWS::Region" }, 
-                      ":", { "Ref": "AWS::AccountId" }, 
-                      ":stream/", { "Ref": "KinesisSubscriptionStream"} ,"\" ",
-                      "--role-arn \"", 
-                      "arn:aws:iam::", { "Ref": "AWS::AccountId" }, 
-                      ":role/", { "Ref": "CloudWatchLogsKinesisRole" },"\""
-                 ]]}
-              }, 
-              "06_nginxAuthConfig": {
+              "04_nginxAuthConfig": {
                 "command": { "Fn::Join" : ["", [ 
                   "htpasswd -c -b /etc/nginx/.htpasswd ", 
                   { "Ref": "NginxUsername" }, " ", 
                   { "Ref": "NginxPassword" }, "\n"
                  ]]}
               },
-              "07_startKCL": {
+              "05_startKCL": {
                 "command": { "Fn::Join" : ["", [
                   "{ nohup java -DkinesisInputStream=", { "Ref": "KinesisSubscriptionStream" },
                     " -DregionName=", { "Ref": "AWS::Region" },
@@ -683,15 +678,15 @@
                   ]]},
                 "cwd": "~"
               },
-              "08_startKibana4": {
+              "06_startKibana4": {
                 "command": "{ nohup ./kibana-4.1.1-linux-x64/bin/kibana > /dev/null 2>&1 & } && disown -h %1",
                 "cwd": "~"
               },
-              "09_getPipAndCurator": {
+              "07_getPipAndCurator": {
                 "command": "python get-pip.py && /usr/local/bin/pip install elasticsearch-curator",
                 "cwd": "/pipstuff"
               },
-              "10_CWLStateDir" : {
+              "08_CWLStateDir" : {
                 "command" : "mkdir -p /var/awslogs/state"
               }
             },
@@ -823,8 +818,8 @@
                     "CreateCWLForStack",
                     {
                       "enabled" : "true", 
-                         "ensureRunning" : "true",
-                        "files" : [ "/etc/awslogs/awslogs.conf" ]
+                      "ensureRunning" : "true",
+                      "files" : [ "/etc/awslogs/awslogs.conf" ]
                     },
                     "AWS::NoValue"
                   ]
