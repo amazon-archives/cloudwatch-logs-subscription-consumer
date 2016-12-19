@@ -655,7 +655,7 @@
                 "command": { "Fn::Join" : ["", [
                   "/usr/share/elasticsearch/bin/plugin -install elasticsearch/elasticsearch-cloud-aws/2.6.0",
                   "&&",
-                  "/usr/share/elasticsearch/bin/plugin -install lmenezes/elasticsearch-kopf/1.5.5"
+                  "/usr/share/elasticsearch/bin/plugin -install mobz/elasticsearch-head"
                 ]]}
               },
               "04_nginxAuthConfig": {
@@ -924,9 +924,9 @@
       "Description" : "Elasticsearch API",
       "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticsearchELB", "DNSName" ]}, "/?pretty"]]}
     },
-    "Kopf" : {
-      "Description" : "Kopf Admin Tool",
-      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticsearchELB", "DNSName" ]}, "/_plugin/kopf"]]}
+    "ESHead" : {
+      "Description" : "ES Admin Tool",
+      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticsearchELB", "DNSName" ]}, "/_plugin/head"]]}
     }
   }
 }
